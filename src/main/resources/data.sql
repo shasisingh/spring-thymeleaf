@@ -1,4 +1,4 @@
-CREATE TABLE HOSTEL
+CREATE TABLE IF NOT EXISTS HOSTEL
 (
     id              INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name            VARCHAR(255),
@@ -61,3 +61,31 @@ VALUES ('Backpackers Inn', '12 Hill St', 20, 15.00, TRUE, CURRENT_TIMESTAMP),
        ('Delta Dwell', '13 Delta Rd', 26, 22.75, TRUE, CURRENT_TIMESTAMP),
        ('Harbor Hub', '18 Harbor Ln', 30, 24.75, TRUE, CURRENT_TIMESTAMP),
        ('Bay Base', '7 Bay Ave', 28, 22.00, TRUE, CURRENT_TIMESTAMP);
+
+CREATE TABLE IF NOT EXISTS REVIEW
+(
+    id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    text    VARCHAR(500) NOT NULL,
+    author  VARCHAR(100) NOT NULL,
+    created TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO REVIEW (text, author, created)
+VALUES ('I came for the WiFi, I stayed for the free breakfast. 10/10, would nap again!', 'Sleepy Sam',
+        CURRENT_TIMESTAMP),
+       ('Lost my socks, found new friends. Hostel magic!', 'Wanderlust Wendy', CURRENT_TIMESTAMP),
+       ('Showers hotter than my love life. Highly recommend.', 'Steamy Steve', CURRENT_TIMESTAMP),
+       ('Beds so comfy, I missed my train. Twice.', 'Snooze Cruise', CURRENT_TIMESTAMP),
+       ('Staff laughed at my jokes. Or maybe at my hair. Either way, 5 stars!', 'Punny Paul', CURRENT_TIMESTAMP),
+       ('I thought I was checking into a movie set. Turns out, it was just this awesome hostel!', 'Leonardo DiCaprio',
+        CURRENT_TIMESTAMP),
+       ('Even my entourage was impressed. And they are hard to please.', 'Dwayne Johnson', CURRENT_TIMESTAMP),
+       ('I asked for a quiet room. They gave me a fan club instead!', 'Tom Holland', CURRENT_TIMESTAMP),
+       ('The only thing missing was a red carpet. But the breakfast made up for it.', 'Scarlett Johansson',
+        CURRENT_TIMESTAMP),
+       ('I came for a night, stayed for a week. My agent is still looking for me.', 'Ryan Reynolds', CURRENT_TIMESTAMP),
+       ('If hostels gave Oscars, this one would win Best Picture.', 'Meryl Streep', CURRENT_TIMESTAMP),
+       ('I tried to go incognito, but the staff recognized me by my laugh.', 'Will Smith', CURRENT_TIMESTAMP),
+       ('I’ve stayed in five-star hotels, but this place has five-star vibes.', 'Zendaya', CURRENT_TIMESTAMP),
+       ('The only drama here is who gets the top bunk.', 'Chris Hemsworth', CURRENT_TIMESTAMP),
+       ('I’d film my next blockbuster here if I could.', 'Gal Gadot', CURRENT_TIMESTAMP);

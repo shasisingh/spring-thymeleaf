@@ -16,18 +16,12 @@
                 <p style="flex:1"><strong>Status:</strong>
                     <span class="status-icon" role="img"
                           th:attr="aria-label=${hostel.available} ? 'Available' : 'Unavailable', data-tooltip=${hostel.available} ? 'Available' : 'Unavailable'"
-                          th:classappend="${hostel.available} ? 'ok' : 'bad'">
-                        <svg viewBox="0 0 24 24" class="icon" xmlns="http://www.w3.org/2000/svg" th:if="${hostel.available}">
-                            <path d="M9 16.17l-3.88-3.88-1.41 1.41L9 19 20.3 7.71l-1.41-1.41z"/>
-                        </svg>
-                        <svg viewBox="0 0 24 24" class="icon" xmlns="http://www.w3.org/2000/svg" th:if="${!hostel.available}">
-                            <path d="M18.3 5.71L12 12.01 5.7 5.71 4.29 7.12l6.3 6.29-6.3 6.29 1.41 1.41 6.3-6.29 6.29 6.29 1.41-1.41-6.29-6.29 6.29-6.29z"/>
-                        </svg>
-                    </span>
+                          th:classappend="${hostel.available} ? 'ok' : 'bad'"></span>
                 </p>
             </div>
-            <form th:action="@{|/hostels/${hostel.id}/delete|}" method="post" class="actions" style="margin-top:1rem">
-                <button class="btn" style="background:#c0392b">Delete</button>
+            <form th:action="@{|/hostels/${hostel.id}/delete|}" method="post" class="actions" style="margin-top:1rem"
+                  id="deleteHostelForm">
+                <button class="btn danger" type="submit">Delete</button>
                 <a class="btn" th:href="@{/hostels}" style="background:#6c757d">Back</a>
             </form>
         </div>
@@ -37,6 +31,7 @@
         <h3>Booked Rooms</h3>
         <div class="actions" style="margin-bottom:.5rem">
             <a class="btn" th:href="@{/allocations/create}">Allocate a Room</a>
+            <a class="btn" th:href="@{/rooms/create}">Add Room</a>
             <span class="muted" th:if="${allocations != null}" th:text="${'Total bookings: ' + allocations.size()}">Total bookings: 0</span>
         </div>
         <div class="table-wrap" th:if="${allocations != null && !#lists.isEmpty(allocations)}">

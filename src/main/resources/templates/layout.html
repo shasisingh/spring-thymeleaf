@@ -18,6 +18,7 @@
     <meta name="twitter:image" content="/icons/social-share.png"/>
     <title>Funky Hostel Hub</title>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link rel="icon" type="image/svg+xml" href="/images/hostel.svg"/>
     <script>
         (function () {
             const root = document.documentElement;
@@ -94,6 +95,64 @@
 
 <button class="btn theme-toggle-fab" type="button" onclick="window.__toggleTheme()" aria-label="Toggle theme">🌓 Toggle
 </button>
+
+<button class="chatbot-fab" type="button" id="chatbotToggle" aria-label="Open chat">
+    <!-- SVG chat icon -->
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+</button>
+<div class="chatbot-modal" id="chatbotModal" style="display:none;">
+    <div class="chatbot-header">
+        <span>ChatBot</span>
+        <button class="chatbot-close" type="button" aria-label="Close chat" id="chatbotClose">&times;</button>
+    </div>
+    <div class="chatbot-body" id="chatbotBody">
+        <div class="chatbot-message chatbot-message-bot">Hi! How can I help you?</div>
+    </div>
+    <form class="chatbot-form" id="chatbotForm" autocomplete="off">
+        <label for="chatbotInput"></label><input type="text" id="chatbotInput" placeholder="Type your message..."
+                                                 autocomplete="off"/>
+        <button type="submit" aria-label="Send">Send</button>
+    </form>
+</div>
+<script>
+    (function () {
+        const fab = document.getElementById('chatbotToggle');
+        const modal = document.getElementById('chatbotModal');
+        const close = document.getElementById('chatbotClose');
+        const form = document.getElementById('chatbotForm');
+        const input = document.getElementById('chatbotInput');
+        const body = document.getElementById('chatbotBody');
+        fab.addEventListener('click', () => {
+            modal.style.display = 'block';
+            input.focus();
+        });
+        close.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const msg = input.value.trim();
+            if (!msg) return;
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chatbot-message chatbot-message-user';
+            userMsg.textContent = msg;
+            body.appendChild(userMsg);
+            input.value = '';
+            // Simulate bot reply
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'chatbot-message chatbot-message-bot';
+                botMsg.textContent = 'Oops — on a coffee break. Beep me later with snacks. ☕🍪';
+                body.appendChild(botMsg);
+                body.scrollTop = body.scrollHeight;
+            }, 600);
+            body.scrollTop = body.scrollHeight;
+        });
+    })();
+</script>
 
 </body>
 </html>

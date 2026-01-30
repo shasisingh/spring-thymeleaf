@@ -35,20 +35,11 @@
                     <td th:text="${h.name}" data-col="name">Name</td>
                     <td th:text="${h.address}" data-col="address">Address</td>
                     <td th:text="${h.capacity}">0</td>
-                    <td th:text="${'€ ' + #numbers.formatDecimal(h.pricePerNight,1,2)}">€ 0.00</td>
+                    <td class="price-emph" th:text="${'€ ' + #numbers.formatDecimal(h.pricePerNight,1,2)}">€ 0.00</td>
                     <td>
                         <span class="status-icon" role="img"
                               th:attr="aria-label=${h.available} ? 'Available' : 'Unavailable', data-tooltip=${h.available} ? 'Available' : 'Unavailable'"
-                              th:classappend="${h.available} ? 'ok' : 'bad'">
-                            <svg viewBox="0 0 24 24" class="icon" xmlns="http://www.w3.org/2000/svg"
-                                 th:if="${h.available}">
-                                <path d="M9 16.17l-3.88-3.88-1.41 1.41L9 19 20.3 7.71l-1.41-1.41z"/>
-                            </svg>
-                            <svg viewBox="0 0 24 24" class="icon" xmlns="http://www.w3.org/2000/svg"
-                                 th:if="${!h.available}">
-                                <path d="M18.3 5.71L12 12.01 5.7 5.71 4.29 7.12l6.3 6.29-6.3 6.29 1.41 1.41 6.3-6.29 6.29 6.29 1.41-1.41-6.29-6.29 6.29-6.29z"/>
-                            </svg>
-                        </span>
+                              th:classappend="${h.available} ? 'ok' : 'bad'"></span>
                     </td>
                     <td><a th:href="@{|/hostels/${h.id}|}">View</a></td>
                 </tr>

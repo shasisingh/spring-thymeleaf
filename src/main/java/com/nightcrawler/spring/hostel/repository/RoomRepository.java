@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findByHostelIdAndAllocatedFalse(Long hostelId);
+
     List<Room> findByHostelId(Long hostelId);
 }

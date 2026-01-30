@@ -3,7 +3,8 @@
 <section th:fragment="content">
     <div class="card">
         <h2>Allocations</h2>
-        <div th:if="${success}" style="margin:.5rem 0; padding:.6rem .8rem; background:#e6ffed; color:#1e7e34; border:1px solid #ccebd6; border-radius:8px;">
+        <div th:if="${success}"
+             style="margin:.5rem 0; padding:.6rem .8rem; background:#e6ffed; color:#1e7e34; border:1px solid #ccebd6; border-radius:8px;">
             <span th:text="${success}">Success</span>
         </div>
         <div class="actions" style="margin-bottom:.5rem">

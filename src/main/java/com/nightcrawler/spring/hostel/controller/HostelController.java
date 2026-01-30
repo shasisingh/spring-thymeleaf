@@ -3,6 +3,7 @@ package com.nightcrawler.spring.hostel.controller;
 import com.nightcrawler.spring.hostel.model.Hostel;
 import com.nightcrawler.spring.hostel.service.AllocationService;
 import com.nightcrawler.spring.hostel.service.HostelService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -14,15 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/hostels")
+@RequiredArgsConstructor
 public class HostelController {
 
     private final HostelService service;
     private final AllocationService allocationService;
-
-    public HostelController(HostelService service, AllocationService allocationService) {
-        this.service = service;
-        this.allocationService = allocationService;
-    }
 
     @GetMapping
     public String list(Model model) {
@@ -53,7 +50,7 @@ public class HostelController {
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        Hostel hostel = service.findById(id).orElse(null);
+        var hostel = service.findById(id).orElse(null);
         model.addAttribute("hostel", hostel);
         model.addAttribute("allocations", allocationService.findByHostelId(id));
         return "hostels/detail";

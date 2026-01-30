@@ -3,6 +3,7 @@ package com.nightcrawler.spring.hostel.controller;
 import com.nightcrawler.spring.hostel.model.Allocation;
 import com.nightcrawler.spring.hostel.service.AllocationService;
 import com.nightcrawler.spring.hostel.service.HostelService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,15 +19,11 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/allocations")
+@RequiredArgsConstructor
 public class AllocationController {
 
     private final AllocationService allocationService;
     private final HostelService hostelService;
-
-    public AllocationController(AllocationService allocationService, HostelService hostelService) {
-        this.allocationService = allocationService;
-        this.hostelService = hostelService;
-    }
 
     @GetMapping("/create")
     public String createForm(Model model) {
@@ -49,6 +46,7 @@ public class AllocationController {
             model.addAttribute("hostels", hostelService.listAvailable());
             return "allocations/create";
         }
+
         LocalDateTime in = allocation.getCheckIn();
         LocalDateTime out = allocation.getCheckOut();
         if (in != null && out != null && (out.isBefore(in) || out.isEqual(in))) {

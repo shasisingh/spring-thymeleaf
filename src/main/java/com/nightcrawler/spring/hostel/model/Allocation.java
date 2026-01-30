@@ -6,13 +6,18 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "ALLOCATION")
 public class Allocation {
+    // Getters and setters
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -54,108 +59,4 @@ public class Allocation {
     @Column(name = "hostel_id")
     private Long hostelId;
 
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public void setDob(LocalDate dob) {
-        this.dob = dob;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getIdentityDoc() {
-        return identityDoc;
-    }
-
-    public void setIdentityDoc(String identityDoc) {
-        this.identityDoc = identityDoc;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public String getHostelRoomNumber() {
-        return hostelRoomNumber;
-    }
-
-    public void setHostelRoomNumber(String hostelRoomNumber) {
-        this.hostelRoomNumber = hostelRoomNumber;
-    }
-
-    public LocalDateTime getCheckIn() {
-        return checkIn;
-    }
-
-    public void setCheckIn(LocalDateTime checkIn) {
-        this.checkIn = checkIn;
-    }
-
-    public LocalDateTime getCheckOut() {
-        return checkOut;
-    }
-
-    public void setCheckOut(LocalDateTime checkOut) {
-        this.checkOut = checkOut;
-    }
-
-    public Integer getNumberOfBed() {
-        return numberOfBed;
-    }
-
-    public void setNumberOfBed(Integer numberOfBed) {
-        this.numberOfBed = numberOfBed;
-    }
-
-    public String getHostelName() {
-        return hostelName;
-    }
-
-    public void setHostelName(String hostelName) {
-        this.hostelName = hostelName;
-    }
-
-    public Long getHostelId() {
-        return hostelId;
-    }
-
-    public void setHostelId(Long hostelId) {
-        this.hostelId = hostelId;
-    }
 }
