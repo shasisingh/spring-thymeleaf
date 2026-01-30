@@ -7,7 +7,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 @SpringBootApplication
 public class SpringHostelApplication {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         new SpringApplicationBuilder(SpringHostelApplication.class)
                 .bannerMode(Banner.Mode.OFF)
                 .headless(false)
