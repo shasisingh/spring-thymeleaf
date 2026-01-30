@@ -13,7 +13,8 @@
                 <p style="flex:1"><strong>Price per night:</strong>
                     <span th:text="${'€ ' + #numbers.formatDecimal(hostel.pricePerNight,1,2)}"></span>
                 </p>
-                <p style="flex:1"><strong>Status:</strong> <span th:text="${hostel.available ? 'Available' : 'Unavailable'}"></span></p>
+                <p style="flex:1"><strong>Status:</strong> <span
+                        th:text="${hostel.available ? 'Available' : 'Unavailable'}"></span></p>
             </div>
             <form th:action="@{|/hostels/${hostel.id}/delete|}" method="post" class="actions" style="margin-top:1rem">
                 <button class="btn" style="background:#c0392b">Delete</button>
