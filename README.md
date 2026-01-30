@@ -14,6 +14,11 @@ A simple hostel manager built with Spring Boot and Thymeleaf. It lets you:
 ./gradlew clean build
 ./gradlew bootRun
 ```
+
+## Home Page Preview
+
+![Home page screenshot](images/home.png)
+
 Then open:
 - Home page: http://localhost:8080/
 - Hostels list: http://localhost:8080/hostels
