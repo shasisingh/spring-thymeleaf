@@ -1,5 +1,5 @@
 # Read Me First
-The following was discovered as part of building this project:
+This is a fun project made just to learn Spring and Thymeleaf.
 
 ## What this project does
 A simple hostel manager built with Spring Boot and Thymeleaf. It lets you:
