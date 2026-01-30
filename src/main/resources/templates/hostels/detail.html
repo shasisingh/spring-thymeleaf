@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+    <div class="card">
+        <h2 th:text="${hostel != null ? hostel.name : 'Not found'}">Hostel</h2>
+        <div th:if="${hostel == null}"><p>Hostel not found.</p></div>
+        <div th:if="${hostel != null}">
+            <div class="form-row">
+                <p style="flex:1"><strong>Address:</strong> <span th:text="${hostel.address}"></span></p>
+                <p style="flex:1"><strong>Capacity:</strong> <span th:text="${hostel.capacity}"></span></p>
+            </div>
+            <div class="form-row">
+                <p style="flex:1"><strong>Price per night:</strong>
+                    <span th:text="${'€ ' + #numbers.formatDecimal(hostel.pricePerNight,1,2)}"></span>
+                </p>
+                <p style="flex:1"><strong>Status:</strong> <span th:text="${hostel.available ? 'Available' : 'Unavailable'}"></span></p>
+            </div>
+            <form th:action="@{|/hostels/${hostel.id}/delete|}" method="post" class="actions" style="margin-top:1rem">
+                <button class="btn" style="background:#c0392b">Delete</button>
+                <a class="btn" th:href="@{/hostels}" style="background:#6c757d">Back</a>
+            </form>
+        </div>
+    </div>
+</section>
+</html>

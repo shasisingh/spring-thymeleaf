@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Funky Hostel Hub</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <script>
+        (function() {
+            const root = document.documentElement;
+            const stored = localStorage.getItem('theme');
+            if (stored) root.setAttribute('data-theme', stored);
+            function toggleTheme() {
+                const current = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', current);
+                localStorage.setItem('theme', current);
+            }
+            window.__toggleTheme = toggleTheme;
+        })();
+    </script>
+</head>
+<body>
+<div class="header">
+    <div class="container header-bar">
+        <nav class="header-nav">
+            <!-- removed nav links: Home, Hostels -->
+        </nav>
+        <h1>Funky Hostel Hub</h1>
+        <div class="header-actions">
+            <!-- moved theme toggle to floating button -->
+        </div>
+    </div>
+</div>
+<div class="container">
+    <th:block th:insert="${content}"/>
+</div>
+<div class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <span>
+                &copy; <span th:text="${#temporals.createNow().getYear()}">2026</span>
+                Funky Hostel Hub — belong to Shashi's Sons
+                <span class="blink" aria-hidden="true">😎</span>
+                <span aria-label="smile">:)</span>
+            </span>
+            <div class="actions">
+                <a class="btn" th:href="@{/}">Home</a>
+                <a class="btn" th:href="@{/hostels}">Hostels</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating theme toggle button -->
+<button class="btn theme-toggle-fab" type="button" onclick="window.__toggleTheme()" aria-label="Toggle theme">
+    🌓 Toggle
+</button>
+
+</body>
+</html>
