@@ -1,4 +1,4 @@
-package com.nightcrowler.spring_hostel.model;
+package com.nightcrawler.spring.hostel.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;

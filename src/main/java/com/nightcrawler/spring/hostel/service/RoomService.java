@@ -1,7 +1,7 @@
-package com.nightcrowler.spring_hostel.service;
+package com.nightcrawler.spring.hostel.service;
 
-import com.nightcrowler.spring_hostel.model.Room;
-import com.nightcrowler.spring_hostel.repository.RoomRepository;
+import com.nightcrawler.spring.hostel.model.Room;
+import com.nightcrawler.spring.hostel.repository.RoomRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

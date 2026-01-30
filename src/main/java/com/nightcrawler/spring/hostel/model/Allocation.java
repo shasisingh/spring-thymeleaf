@@ -1,4 +1,4 @@
-package com.nightcrowler.spring_hostel.model;
+package com.nightcrawler.spring.hostel.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -44,6 +44,9 @@ public class Allocation {
 
     @Column(name = "hostel_name")
     private String hostelName;
+
+    @Column(name = "hostel_id")
+    private Long hostelId;
 
     // Getters and setters
     public Long getId() {
@@ -140,5 +143,13 @@ public class Allocation {
 
     public void setHostelName(String hostelName) {
         this.hostelName = hostelName;
+    }
+
+    public Long getHostelId() {
+        return hostelId;
+    }
+
+    public void setHostelId(Long hostelId) {
+        this.hostelId = hostelId;
     }
 }

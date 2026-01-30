@@ -1,8 +1,8 @@
-package com.nightcrowler.spring_hostel.controller;
+package com.nightcrawler.spring.hostel.controller;
 
-import com.nightcrowler.spring_hostel.model.Allocation;
-import com.nightcrowler.spring_hostel.service.AllocationService;
-import com.nightcrowler.spring_hostel.service.HostelService;
+import com.nightcrawler.spring.hostel.model.Allocation;
+import com.nightcrawler.spring.hostel.service.AllocationService;
+import com.nightcrawler.spring.hostel.service.HostelService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -60,7 +60,10 @@ public class AllocationController {
         }
         if (hostelId != null) {
             hostelService.findById(hostelId)
-                    .ifPresent(hostel -> allocation.setHostelName(hostel.getName()));
+                    .ifPresent(hostel -> {
+                        allocation.setHostelName(hostel.getName());
+                        allocation.setHostelId(hostel.getId());
+                    });
         }
         allocationService.save(allocation);
         redirectAttributes.addFlashAttribute("success", "Allocation created successfully");

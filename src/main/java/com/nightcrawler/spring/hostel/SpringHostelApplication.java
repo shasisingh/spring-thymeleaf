@@ -1,7 +1,6 @@
-package com.nightcrowler.spring_hostel;
+package com.nightcrawler.spring.hostel;
 
 import org.springframework.boot.Banner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 

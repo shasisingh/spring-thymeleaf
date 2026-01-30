@@ -22,5 +22,38 @@
             </form>
         </div>
     </div>
+
+    <div class="card">
+        <h3>Booked Rooms</h3>
+        <div class="actions" style="margin-bottom:.5rem">
+            <a class="btn" th:href="@{/allocations/create}">Allocate a Room</a>
+            <span class="muted" th:if="${allocations != null}" th:text="${'Total bookings: ' + allocations.size()}">Total bookings: 0</span>
+        </div>
+        <div class="table-wrap" th:if="${allocations != null && !#lists.isEmpty(allocations)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Room</th>
+                    <th>Guest</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Beds</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${allocations}">
+                    <td th:text="${a.hostelRoomNumber}">Room</td>
+                    <td th:text="${a.fullName}">Guest</td>
+                    <td th:text="${#temporals.format(a.checkIn, 'yyyy-MM-dd HH:mm')}">Check In</td>
+                    <td th:text="${#temporals.format(a.checkOut, 'yyyy-MM-dd HH:mm')}">Check Out</td>
+                    <td th:text="${a.numberOfBed}">Beds</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${allocations == null || #lists.isEmpty(allocations)}" class="muted">
+            No bookings yet for this hostel.
+        </div>
+    </div>
 </section>
 </html>

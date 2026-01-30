@@ -1,6 +1,6 @@
-package com.nightcrowler.spring_hostel.repository;
+package com.nightcrawler.spring.hostel.repository;
 
-import com.nightcrowler.spring_hostel.model.Room;
+import com.nightcrawler.spring.hostel.model.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,7 +1,8 @@
-package com.nightcrowler.spring_hostel.controller;
+package com.nightcrawler.spring.hostel.controller;
 
-import com.nightcrowler.spring_hostel.model.Hostel;
-import com.nightcrowler.spring_hostel.service.HostelService;
+import com.nightcrawler.spring.hostel.model.Hostel;
+import com.nightcrawler.spring.hostel.service.AllocationService;
+import com.nightcrawler.spring.hostel.service.HostelService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -16,9 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class HostelController {
 
     private final HostelService service;
+    private final AllocationService allocationService;
 
-    public HostelController(HostelService service) {
+    public HostelController(HostelService service, AllocationService allocationService) {
         this.service = service;
+        this.allocationService = allocationService;
     }
 
     @GetMapping
@@ -50,8 +53,9 @@ public class HostelController {
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        var h = service.findById(id).orElse(null);
-        model.addAttribute("hostel", h);
+        Hostel hostel = service.findById(id).orElse(null);
+        model.addAttribute("hostel", hostel);
+        model.addAttribute("allocations", allocationService.findByHostelId(id));
         return "hostels/detail";
     }
 
