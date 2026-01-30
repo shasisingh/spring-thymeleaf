@@ -13,8 +13,18 @@
                 <p style="flex:1"><strong>Price per night:</strong>
                     <span th:text="${'€ ' + #numbers.formatDecimal(hostel.pricePerNight,1,2)}"></span>
                 </p>
-                <p style="flex:1"><strong>Status:</strong> <span
-                        th:text="${hostel.available ? 'Available' : 'Unavailable'}"></span></p>
+                <p style="flex:1"><strong>Status:</strong>
+                    <span class="status-icon" role="img"
+                          th:attr="aria-label=${hostel.available} ? 'Available' : 'Unavailable', data-tooltip=${hostel.available} ? 'Available' : 'Unavailable'"
+                          th:classappend="${hostel.available} ? 'ok' : 'bad'">
+                        <svg viewBox="0 0 24 24" class="icon" xmlns="http://www.w3.org/2000/svg" th:if="${hostel.available}">
+                            <path d="M9 16.17l-3.88-3.88-1.41 1.41L9 19 20.3 7.71l-1.41-1.41z"/>
+                        </svg>
+                        <svg viewBox="0 0 24 24" class="icon" xmlns="http://www.w3.org/2000/svg" th:if="${!hostel.available}">
+                            <path d="M18.3 5.71L12 12.01 5.7 5.71 4.29 7.12l6.3 6.29-6.3 6.29 1.41 1.41 6.3-6.29 6.29 6.29 1.41-1.41-6.29-6.29 6.29-6.29z"/>
+                        </svg>
+                    </span>
+                </p>
             </div>
             <form th:action="@{|/hostels/${hostel.id}/delete|}" method="post" class="actions" style="margin-top:1rem">
                 <button class="btn" style="background:#c0392b">Delete</button>

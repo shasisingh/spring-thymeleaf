@@ -329,7 +329,10 @@ input[type="date"] {
 
 /* Prevent uneven heights due to font differences */
 .form-vertical > label > span,
-.form-row > label > span { font-weight: 600; color: var(--text); }
+.form-row > label > span {
+    font-weight: 600;
+    color: var(--text);
+}
 
 .form-row input, .form-row select {
     flex: 1;
@@ -441,6 +444,41 @@ input[type="date"] {
 .unavailable {
     color: var(--danger);
     font-weight: 700;
+}
+
+.status-icon {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: .4rem;
+    vertical-align: middle;
+    background: #bbb;
+}
+
+.status-icon.ok {
+    background: var(--success);
+}
+
+.status-icon.bad {
+    background: var(--danger);
+}
+
+.status-icon .icon {
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: .35rem;
+    fill: currentColor;
+}
+
+.status-icon.ok {
+    color: var(--success);
+}
+
+.status-icon.bad {
+    color: var(--danger);
 }
 
 /* Footer */
@@ -575,4 +613,56 @@ input[type="date"] {
         bottom: .75rem;
         gap: .4rem;
     }
+}
+
+/* Themed tooltip for status icons */
+[data-tooltip] {
+    position: relative;
+}
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    bottom: 125%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: .35rem .5rem;
+    border-radius: 8px;
+    font-size: .85rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .12s ease, transform .12s ease;
+    z-index: 1000;
+}
+[data-tooltip]::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 115%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--bg-card);
+    opacity: 0;
+    transition: opacity .12s ease;
+    z-index: 1000;
+}
+[data-tooltip]:hover::after,
+[data-tooltip]:focus::after {
+    opacity: 1;
+}
+[data-tooltip]:hover::before,
+[data-tooltip]:focus::before {
+    opacity: 1;
+}
+:root[data-theme="dark"] [data-tooltip]::after {
+    background: var(--bg-card);
+    color: var(--text);
+    border-color: var(--border);
+}
+:root[data-theme="dark"] [data-tooltip]::before {
+    border-top-color: var(--bg-card);
 }
