@@ -1,6 +1,10 @@
 # Read Me First
 This is a fun project made just to learn Spring and Thymeleaf.
 
+## Requirements
+- Java 25 or newer (with virtual thread support)
+- Gradle 9.3.0 or newer
+
 ## What this project does
 A simple hostel manager built with Spring Boot and Thymeleaf. It lets you:
 - Browse hostels, see details, and view currently booked rooms for each hostel.
