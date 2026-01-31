@@ -24,18 +24,22 @@ A simple hostel manager built with Spring Boot and Thymeleaf. It lets you:
 ![Home page screenshot](images/home-v1.png)
 
 Then open:
-- Home page: http://localhost:8080/
-- Hostels list: http://localhost:8080/hostels
-- Allocations: http://localhost:8080/allocations
-- Create allocation: http://localhost:8080/allocations/create
+- Home page: http://localhost:8080/api/v1
+- Hostels list: http://localhost:8080/api/v1/hostels
+- Allocations: http://localhost:8080/api/v1/allocations
+- Create allocation: http://localhost:8080/api/v1/allocations/create
 
 ## Key routes
-- GET / — home page
-- GET /hostels — list all hostels
-- GET /hostels/{id} — view hostel details + booked rooms
-- GET /allocations — list allocations
-- GET /allocations/create — allocation form
-- POST /allocations/create — save allocation
+- GET /api/v1 — home page
+- GET /api/v1/hostels — list all hostels
+- GET /api/v1/hostels/{id} — view hostel details + booked rooms
+- GET /api/v1/hostels/{id}/rooms-page — manage rooms for a hostel
+- GET /api/v1/rooms/create — add room form (optional hostelId, ref)
+- POST /api/v1/rooms/create — save room
+- POST /api/v1/rooms/{id}/delete — delete room
+- GET /api/v1/allocations — list allocations
+- GET /api/v1/allocations/create — allocation form
+- POST /api/v1/allocations/create — save allocation
 
 ## Data model (simplified)
 - Hostel: id, name, address, capacity, pricePerNight, available
@@ -44,7 +48,7 @@ Then open:
 
 ## Tech stack
 - Spring Boot, Spring MVC, Thymeleaf 3
-- H2 (in-memory) by default; see application.properties
+- H2 (in-memory) by default; see application.yml
 - Gradle build (see build.gradle.kts)
 - Responsive CSS in src/main/resources/static/css/style.css
 
@@ -76,12 +80,12 @@ These additional references should also help you:
 ## Pages at a glance
 Click a thumbnail to open the page when the app is running.
 
-- [Home](http://localhost:8080/)
-- [Hostels list](http://localhost:8080/hostels)
-- [Hostel detail](http://localhost:8080/hostels/1)
-- [Allocations list](http://localhost:8080/allocations)
-- [Create allocation](http://localhost:8080/allocations/create)
+- [Home](http://localhost:8080/api/v1)
+- [Hostels list](http://localhost:8080/api/v1/hostels)
+- [Hostel detail](http://localhost:8080/api/v1/hostels/1)
+- [Allocations list](http://localhost:8080/api/v1/allocations)
+- [Create allocation](http://localhost:8080/api/v1/allocations/create)
 
 | Hostels list | Hostel detail | Allocations list | Create allocation |
 | --- | --- | --- | --- |
-| [![Hostels list](/images/view-hostel.png)](http://localhost:8080/hostels) | [![Hostel detail](/images/view-full-hostel-details.png)](http://localhost:8080/hostels/1) | [![Allocations list](/images/allocation.png)](http://localhost:8080/allocations) | [![Create allocation](/images/add-new-allocation.png)](http://localhost:8080/allocations/create) |
+| [![Hostels list](/images/view-hostel.png)](http://localhost:8080/api/v1/hostels) | [![Hostel detail](/images/view-full-hostel-details.png)](http://localhost:8080/api/v1/hostels/1) | [![Allocations list](/images/allocation.png)](http://localhost:8080/api/v1/allocations) | [![Create allocation](/images/add-new-allocation.png)](http://localhost:8080/api/v1/allocations/create) |
