@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<!-- Fragment: review list -->
+<div th:fragment="reviewList(reviews, reviewPage)">
+    <div class="review-tiles" th:if="${reviews != null && !#lists.isEmpty(reviews)}">
+        <div class="review-tile" th:each="r : ${reviews}">
+            <div class="review-text" th:text="'“' + ${r.text} + '”'"></div>
+            <div class="review-author" th:text="'— ' + ${r.author}"></div>
+            <div class="rating-stars readonly" th:if="${r.rating != null}" th:with="rVal=${r.rating}">
+                <span th:each="i : ${#numbers.sequence(1,5)}"
+                      th:classappend="${i <= rVal} ? 'filled' : 'empty'"
+                      th:text="${i <= rVal} ? '★' : '☆'">★</span>
+            </div>
+            <div class="review-date" th:text="${#temporals.format(r.created, 'dd-MM-yyyy HH:mm')}"></div>
+        </div>
+    </div>
+    <div th:if="${reviews == null || #lists.isEmpty(reviews)}" class="muted">No reviews yet. Be the first to leave
+        one!
+    </div>
+
+    <div class="pagination" th:if="${reviewPage != null and reviewPage.totalPages > 1}"
+         style="margin:.5rem 0; display:flex; gap:.25rem; align-items:center;">
+        <a class="btn" th:classappend="${reviewPage.first}? ' disabled' : ''"
+           th:href="@{${#httpServletRequest.requestURI}(page=${reviewPage.number - 1})}" th:if="${!reviewPage.first}">Prev</a>
+        <span class="muted">Page <span th:text="${reviewPage.number + 1}">1</span> of <span
+                th:text="${reviewPage.totalPages}">1</span></span>
+        <a class="btn" th:classappend="${reviewPage.last}? ' disabled' : ''"
+           th:href="@{${#httpServletRequest.requestURI}(page=${reviewPage.number + 1})}" th:if="${!reviewPage.last}">Next</a>
+    </div>
+</div>
+
+<!-- Fragment: review form: uses standard model attribute 'reviewForm' -->
+<div th:fragment="reviewForm(formAction)">
+    <form th:object="${reviewForm}"
+          th:action="${formAction}" method="post" class="form-vertical" style="margin-top:.75rem">
+        <label>
+            <span>Your Name</span>
+            <input type="text" th:field="*{author}" maxlength="100" required>
+            <span class="error" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></span>
+        </label>
+        <label>
+            <span>Your Review</span>
+            <textarea th:field="*{text}" rows="4" maxlength="500" required></textarea>
+            <span class="error" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></span>
+        </label>
+        <label>
+            <span>Your Rating</span>
+            <div class="rating-stars" aria-label="Rating out of 5">
+                <input type="radio" th:field="*{rating}" value="5" id="frag-star5"><label for="frag-star5"
+                                                                                          title="5 stars">★</label>
+                <input type="radio" th:field="*{rating}" value="4" id="frag-star4"><label for="frag-star4"
+                                                                                          title="4 stars">★</label>
+                <input type="radio" th:field="*{rating}" value="3" id="frag-star3"><label for="frag-star3"
+                                                                                          title="3 stars">★</label>
+                <input type="radio" th:field="*{rating}" value="2" id="frag-star2"><label for="frag-star2"
+                                                                                          title="2 stars">★</label>
+                <input type="radio" th:field="*{rating}" value="1" id="frag-star1"><label for="frag-star1"
+                                                                                          title="1 star">★</label>
+            </div>
+            <span class="error" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}"></span>
+        </label>
+        <div class="actions" style="margin-top:.5rem">
+            <button class="btn" type="submit">Submit Review</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

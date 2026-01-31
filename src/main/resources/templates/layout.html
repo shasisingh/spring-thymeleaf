@@ -28,89 +28,8 @@
           sizes="any"/>
     <!-- Safari pinned tab (monochrome); color will be updated via JS -->
     <link id="maskIcon" rel="mask-icon" href="/images/hostel.svg" color="#7d6df0"/>
-    <script>
-        (function () {
-            const root = document.documentElement;
-            const themeMeta = document.querySelector('meta[name="theme-color"]');
-            const maskIcon = document.getElementById('maskIcon');
-
-            function applyThemeColor(current) {
-                const color = current === 'dark' ? '#1a1d24' : '#7d6df0';
-                if (themeMeta) themeMeta.setAttribute('content', color);
-                if (maskIcon) maskIcon.setAttribute('color', current === 'dark' ? '#ffffff' : '#7d6df0');
-            }
-
-            function applyFavicon(current) {
-                const href = current === 'dark' ? '/images/hostel-dark.svg' : '/images/hostel.svg';
-                const head = document.getElementsByTagName('head')[0];
-                // Replace only our dynamic icons, keep media-based fallbacks intact
-                const oldIcon = document.getElementById('favicon');
-                const oldShortcut = document.getElementById('faviconShortcut');
-                if (oldIcon) oldIcon.parentNode.removeChild(oldIcon);
-                if (oldShortcut) oldShortcut.parentNode.removeChild(oldShortcut);
-                const icon = document.createElement('link');
-                icon.id = 'favicon';
-                icon.rel = 'icon';
-                icon.type = 'image/svg+xml';
-                icon.setAttribute('sizes', 'any');
-                icon.href = href + '?v=' + current + '-' + Date.now();
-                head.appendChild(icon);
-                const shortcut = document.createElement('link');
-                shortcut.id = 'faviconShortcut';
-                shortcut.rel = 'shortcut icon';
-                shortcut.type = 'image/svg+xml';
-                shortcut.setAttribute('sizes', 'any');
-                shortcut.href = icon.href;
-                head.appendChild(shortcut);
-            }
-
-            function apply(current) {
-                applyThemeColor(current);
-                applyFavicon(current);
-            }
-
-            // Determine initial theme: stored -> system preference -> light
-            let initial = localStorage.getItem('theme');
-            if (!initial) {
-                try {
-                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                        initial = 'dark';
-                    }
-                } catch (_) {
-                }
-            }
-            if (!initial) initial = 'light';
-            root.setAttribute('data-theme', initial);
-            apply(initial);
-
-            function toggleTheme() {
-                const current = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-                root.setAttribute('data-theme', current);
-                localStorage.setItem('theme', current);
-                apply(current);
-                setTimeout(() => apply(current), 75);
-            }
-
-            window.__toggleTheme = toggleTheme;
-
-            function markActiveLinks() {
-                const path = location.pathname.replace(/\/$/, ''); // trim trailing slash
-                document.querySelectorAll('.footer .actions a').forEach(a => {
-                    try {
-                        const href = new URL(a.getAttribute('href'), location.origin).pathname.replace(/\/$/, '');
-                        if (href === path) {
-                            a.classList.add('active');
-                        } else {
-                            a.classList.remove('active');
-                        }
-                    } catch (_) {
-                    }
-                });
-            }
-
-            window.addEventListener('DOMContentLoaded', markActiveLinks);
-        })();
-    </script>
+    <!-- Load theme/favicon script only if requested (default true) -->
+    <script th:if="${includeThemeScript} ?: true" defer th:src="@{/js/site-theme.js}"></script>
 </head>
 <body>
 <div class="header" role="banner">
@@ -151,7 +70,9 @@
     <a class="btn" th:href="@{/api/v1/reviews}" aria-label="Reviews">Reviews</a>
 </nav>
 
-<button class="btn theme-toggle-fab" type="button" onclick="window.__toggleTheme()" aria-label="Toggle theme">🌓 Toggle
+<!-- Show toggle only if theme script is present -->
+<button class="btn theme-toggle-fab" type="button" onclick="window.__toggleTheme()" aria-label="Toggle theme"
+        th:if="${includeThemeScript} ?: true">🌓 Toggle
 </button>
 
 <button class="chatbot-fab" type="button" id="chatbotToggle" aria-label="Open chat">
@@ -176,71 +97,9 @@
         <button type="submit" aria-label="Send">Send</button>
     </form>
 </div>
-<script>
-    (function () {
-        const fab = document.getElementById('chatbotToggle');
-        const modal = document.getElementById('chatbotModal');
-        const close = document.getElementById('chatbotClose');
-        const form = document.getElementById('chatbotForm');
-        const input = document.getElementById('chatbotInput');
-        const body = document.getElementById('chatbotBody');
+<!-- Chatbot behavior (conditional) -->
+<script th:if="${includeChatbotScript} ?: true" defer th:src="@{/js/chatbot.js}"></script>
 
-        function trapKeys(e) {
-            if (e.key === 'Escape') {
-                hide();
-            }
-            if (e.key === 'Tab') {
-                const focusables = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                const first = focusables[0];
-                const last = focusables[focusables.length - 1];
-                if (e.shiftKey && document.activeElement === first) {
-                    e.preventDefault();
-                    last.focus();
-                } else if (!e.shiftKey && document.activeElement === last) {
-                    e.preventDefault();
-                    first.focus();
-                }
-            }
-        }
-
-        function show() {
-            modal.style.display = 'block';
-            modal.classList.add('show');
-            input.focus();
-            modal.addEventListener('keydown', trapKeys);
-            document.body.setAttribute('data-modal-open', 'true');
-        }
-
-        function hide() {
-            modal.classList.remove('show');
-            modal.style.display = 'none';
-            modal.removeEventListener('keydown', trapKeys);
-            document.body.removeAttribute('data-modal-open');
-        }
-
-        fab.addEventListener('click', show);
-        close.addEventListener('click', hide);
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const msg = input.value.trim();
-            if (!msg) return;
-            const userMsg = document.createElement('div');
-            userMsg.className = 'chatbot-message chatbot-message-user';
-            userMsg.textContent = msg;
-            body.appendChild(userMsg);
-            input.value = '';
-            // Simulate bot reply
-            setTimeout(() => {
-                const botMsg = document.createElement('div');
-                botMsg.className = 'chatbot-message chatbot-message-bot';
-                botMsg.textContent = 'Oops — on a coffee break. Beep me later with snacks. ☕🍪';
-                body.appendChild(botMsg);
-                body.scrollTop = body.scrollHeight;
-            }, 600);
-            body.scrollTop = body.scrollHeight;
-        });
-    })();
-</script>
 <div class="toast-container">
     <div th:if="${success}" class="toast success">
         <span class="toast-content">
@@ -282,31 +141,9 @@
         </span>
     </div>
 </div>
-<script>
-    (function () {
-        const toasts = document.querySelectorAll('.toast-container .toast');
-        toasts.forEach((t, idx) => {
-            // show with small stagger
-            setTimeout(() => {
-                t.classList.add('show');
-                // auto hide after 3.5s
-                const hideId = setTimeout(() => {
-                    t.classList.remove('show');
-                    t.remove();
-                }, 3500);
-                // dismiss on click
-                const closeBtn = t.querySelector('.toast-close');
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', () => {
-                        clearTimeout(hideId);
-                        t.classList.remove('show');
-                        t.remove();
-                    });
-                }
-            }, idx * 150);
-        });
-    })();
-</script>
+<!-- Toasts behavior (conditional) -->
+<script th:if="${includeToastScript} ?: true" defer th:src="@{/js/toasts.js}"></script>
+
 <div id="confirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle"
      style="display:none;">
     <div class="modal">
@@ -339,86 +176,7 @@
         </div>
     </div>
 </div>
-<script>
-    (function () {
-        // Accessible confirmation modal hooking
-        let pendingForm = null;
-        const overlay = document.getElementById('confirmModal');
-        const msgEl = document.getElementById('confirmMessage');
-        const btnYes = document.getElementById('confirmYes');
-        const btnNo = document.getElementById('confirmNo');
-        const btnClose = document.getElementById('confirmClose');
-
-        function openConfirm(message) {
-            msgEl.textContent = message || 'Are you sure you want to delete this item?';
-            overlay.style.display = 'flex';
-            overlay.classList.add('show');
-            btnYes.focus();
-            overlay.addEventListener('keydown', trapKeys);
-            document.body.setAttribute('data-modal-open', 'true');
-        }
-
-        function closeConfirm() {
-            overlay.classList.remove('show');
-            overlay.style.display = 'none';
-            overlay.removeEventListener('keydown', trapKeys);
-            document.body.removeAttribute('data-modal-open');
-            pendingForm = null;
-        }
-
-        function trapKeys(e) {
-            if (e.key === 'Escape') {
-                closeConfirm();
-            }
-            if (e.key === 'Tab') {
-                const focusables = overlay.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                const first = focusables[0];
-                const last = focusables[focusables.length - 1];
-                if (e.shiftKey && document.activeElement === first) {
-                    e.preventDefault();
-                    last.focus();
-                } else if (!e.shiftKey && document.activeElement === last) {
-                    e.preventDefault();
-                    first.focus();
-                }
-            }
-        }
-
-        btnYes.addEventListener('click', function () {
-            if (pendingForm) {
-                const f = pendingForm; // keep ref
-                closeConfirm();
-                // submit after closing to avoid focus issues
-                f.submit();
-            } else {
-                closeConfirm();
-            }
-        });
-
-        function cancel() {
-            closeConfirm();
-        }
-
-        btnNo.addEventListener('click', cancel);
-        btnClose.addEventListener('click', cancel);
-        overlay.addEventListener('click', function (e) {
-            if (e.target === overlay) cancel();
-        });
-
-        function bindDeleteConfirmsAccessible() {
-            document.querySelectorAll('form.confirm-delete').forEach(f => {
-                f.addEventListener('submit', function (e) {
-                    // prevent default and show modal
-                    e.preventDefault();
-                    const message = this.getAttribute('data-confirm') || 'Are you sure you want to delete this item?';
-                    pendingForm = this;
-                    openConfirm(message);
-                });
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', bindDeleteConfirmsAccessible);
-    })();
-</script>
+<!-- External confirm modal script (conditional) -->
+<script th:if="${includeConfirmScript} ?: true" defer th:src="@{/js/confirm-modal.js}"></script>
 </body>
 </html>

@@ -3,38 +3,11 @@
 <section th:fragment="content">
     <div class="card">
         <h2>Leave a Review</h2>
-        <form th:action="@{/api/v1/reviews/create}" th:object="${reviewForm}" method="post" class="form-vertical">
-            <label>
-                <span>Your Name</span>
-                <input type="text" th:field="*{author}" maxlength="100" required>
-                <span class="error" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></span>
-            </label>
-            <label>
-                <span>Your Review</span>
-                <textarea th:field="*{text}" rows="5" maxlength="500" required></textarea>
-                <span class="error" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></span>
-            </label>
-            <label>
-                <span>Your Rating</span>
-                <div class="rating-stars" aria-label="Rating out of 5">
-                    <input type="radio" th:field="*{rating}" value="5" id="star5"><label for="star5"
-                                                                                         title="5 stars">★</label>
-                    <input type="radio" th:field="*{rating}" value="4" id="star4"><label for="star4"
-                                                                                         title="4 stars">★</label>
-                    <input type="radio" th:field="*{rating}" value="3" id="star3"><label for="star3"
-                                                                                         title="3 stars">★</label>
-                    <input type="radio" th:field="*{rating}" value="2" id="star2"><label for="star2"
-                                                                                         title="2 stars">★</label>
-                    <input type="radio" th:field="*{rating}" value="1" id="star1"><label for="star1"
-                                                                                         title="1 star">★</label>
-                </div>
-                <span class="error" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}"></span>
-            </label>
-            <div class="actions" style="margin-top:.75rem">
-                <button class="btn" type="submit">Submit Review</button>
-                <a class="btn" th:href="@{/api/v1/reviews}" style="background:#6c757d">Cancel</a>
-            </div>
-        </form>
+        <div th:replace="~{fragments/reviews :: reviewForm(@{/api/v1/reviews/create})}"></div>
+        <div class="actions" style="margin-top:.75rem">
+            <a class="btn" th:href="@{/api/v1/reviews}" style="background:#6c757d">Back to Reviews</a>
+            <a class="btn" th:href="@{/api/v1}" style="background:#6c757d">Home</a>
+        </div>
     </div>
 </section>
 </html>

@@ -44,8 +44,7 @@
                 </div>
                 <div class="hostel-tile">
                     <span class="tile-label">Created At</span>
-                    <span class="tile-value"
-                          th:text="${#temporals.format(hostel.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                    <span class="tile-value" th:text="${#temporals.format(hostel.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </div>
                 <div class="hostel-tile">
                     <span class="tile-label">Reviews</span>
@@ -118,6 +117,7 @@
             No bookings yet for this hostel.
         </div>
     </div>
+
     <div id="allocation-modal" class="modal-overlay" role="dialog" aria-modal="true"
          aria-labelledby="allocationModalTitle">
         <div class="modal">
@@ -131,112 +131,8 @@
 
     <div class="card" th:if="${hostel != null}">
         <h3>Guest Reviews</h3>
-        <div class="review-tiles" th:if="${reviews != null && !#lists.isEmpty(reviews)}">
-            <div class="review-tile" th:each="r : ${reviews}">
-                <div class="review-text" th:text="'“' + ${r.text} + '”'"></div>
-                <div class="review-author" th:text="'— ' + ${r.author}"></div>
-                <div class="review-date" th:text="${#temporals.format(r.created, 'dd-MM-yyyy HH:mm')}"></div>
-            </div>
-        </div>
-        <div th:if="${reviews == null || #lists.isEmpty(reviews)}" class="muted">No reviews yet. Be the first to leave one!</div>
-
-        <div class="pagination" th:if="${reviewPage != null and reviewPage.totalPages > 1}" style="margin:.5rem 0; display:flex; gap:.25rem; align-items:center;">
-            <a class="btn" th:classappend="${reviewPage.first}? ' disabled' : ''"
-               th:href="@{'/api/v1/hostels/' + ${hostel.id} + '(page=' + ${reviewPage.number - 1} + ')'}" th:if="${!reviewPage.first}">Prev</a>
-            <span class="muted">Page <span th:text="${reviewPage.number + 1}">1</span> of <span th:text="${reviewPage.totalPages}">1</span></span>
-            <a class="btn" th:classappend="${reviewPage.last}? ' disabled' : ''"
-               th:href="@{'/api/v1/hostels/' + ${hostel.id} + '(page=' + ${reviewPage.number + 1} + ')'}" th:if="${!reviewPage.last}">Next</a>
-        </div>
-
-        <form th:action="@{'/api/v1/hostels/' + ${hostel.id} + '/reviews'}" th:object="${reviewForm}" method="post" class="form-vertical" style="margin-top:.75rem">
-            <label>
-                <span>Your Name</span>
-                <input type="text" th:field="*{author}" maxlength="100" required>
-                <span class="error" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></span>
-            </label>
-            <label>
-                <span>Your Review</span>
-                <textarea th:field="*{text}" rows="4" maxlength="500" required></textarea>
-                <span class="error" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></span>
-            </label>
-            <div class="actions" style="margin-top:.5rem">
-                <button class="btn" type="submit">Submit Review</button>
-            </div>
-        </form>
+        <div th:replace="~{fragments/reviews :: reviewList(${reviews}, ${reviewPage})}"></div>
+        <div th:replace="~{fragments/reviews :: reviewForm(@{/api/v1/hostels/{id}/reviews(id=${hostel.id})})}"></div>
     </div>
 </section>
-<script>
-    (function () {
-        function openModalWithHtml(html) {
-            const body = document.getElementById('modal-body-content');
-            const overlay = document.getElementById('allocation-modal');
-            body.innerHTML = html;
-            overlay.classList.add('show');
-            // focus management
-            const closeBtn = overlay.querySelector('.modal-close');
-            closeBtn.focus();
-        }
-
-        function bindEllipsis() {
-            document.querySelectorAll('.btn-details').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const row = this.closest('tr');
-                    const allocationId = row ? row.getAttribute('data-id') : null;
-                    if (!allocationId) return;
-                    fetch(`/api/v1/allocations/${allocationId}`)
-                        .then(r => r.json())
-                        .then(a => {
-                            let html = `<div><strong>Guest:</strong> ${a.fullName} <br/><strong>Email:</strong> ${a.email} <br/><strong>Address:</strong> ${a.address} <br/><strong>DOB:</strong> ${a.dob || ''}</div>`;
-                            html += `<div style='margin-top:0.7em;'><strong>Room:</strong> ${a.room ? a.room.roomNumber : a.hostelRoomNumber} (${a.room ? a.room.roomType : 'N/A'})</div>`;
-                            html += `<div><strong>Check In:</strong> ${a.checkIn} <br/><strong>Check Out:</strong> ${a.checkOut}</div>`;
-                            html += `<div><strong>Identity Doc:</strong> ${a.identityDoc} <br/><strong>Payment:</strong> ${a.paymentMethod}</div>`;
-                            openModalWithHtml(html);
-                        });
-                });
-            });
-        }
-
-        function closeOnOverlayClick() {
-            const overlay = document.getElementById('allocation-modal');
-            overlay && overlay.addEventListener('click', function (e) {
-                if (e.target === overlay) closeModal();
-            });
-            overlay && overlay.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') closeModal();
-                if (e.key === 'Tab') {
-                    const focusables = overlay.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                    const first = focusables[0];
-                    const last = focusables[focusables.length - 1];
-                    if (e.shiftKey && document.activeElement === first) {
-                        e.preventDefault();
-                        last.focus();
-                    } else if (!e.shiftKey && document.activeElement === last) {
-                        e.preventDefault();
-                        first.focus();
-                    }
-                }
-            });
-        }
-
-        window.closeModal = function () {
-            const overlay = document.getElementById('allocation-modal');
-            overlay.classList.remove('show');
-            document.getElementById('modal-body-content').innerHTML = '';
-        };
-        bindEllipsis();
-        closeOnOverlayClick();
-    })();
-
-    // prevent form submit if disabled (extra client-side guard)
-    (function () {
-        const form = document.querySelector('form.confirm-delete[action*="/api/v1/hostels/"]');
-        if (!form) return;
-        const btn = form.querySelector('button[type="submit"]');
-        form.addEventListener('submit', function (e) {
-            if (btn && (btn.getAttribute('disabled') !== null || btn.getAttribute('aria-disabled') === 'true')) {
-                e.preventDefault();
-            }
-        });
-    })();
-</script>
 </html>

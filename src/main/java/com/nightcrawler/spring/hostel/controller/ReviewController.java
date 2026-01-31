@@ -1,8 +1,7 @@
 package com.nightcrawler.spring.hostel.controller;
 
-import com.nightcrawler.spring.hostel.model.Review;
 import com.nightcrawler.spring.hostel.model.ReviewForm;
-import com.nightcrawler.spring.hostel.repository.ReviewRepository;
+import com.nightcrawler.spring.hostel.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -21,11 +20,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class ReviewController {
 
-    private final ReviewRepository reviewRepository;
+    private final ReviewService reviewService;
 
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("reviews", reviewRepository.findAll());
+        // For global list, no pagination currently; pass as null for fragment compatibility
+        model.addAttribute("reviews", reviewService.findAll());
+        model.addAttribute("reviewPage", null);
         return "reviews/list";
     }
 
@@ -39,14 +40,11 @@ public class ReviewController {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String create(@Valid @ModelAttribute("reviewForm") ReviewForm form,
                          BindingResult result,
-                         Model model,
                          RedirectAttributes ra) {
         if (result.hasErrors()) {
             return "reviews/create";
         }
-        Review review = new Review(form.getText(), form.getAuthor());
-        review.setRating(form.getRating());
-        reviewRepository.save(review);
+        reviewService.createWithoutHostel(form);
         ra.addFlashAttribute("success", "Thanks for your review!");
         return "redirect:/api/v1/reviews";
     }
