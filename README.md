@@ -21,7 +21,7 @@ A simple hostel manager built with Spring Boot and Thymeleaf. It lets you:
 
 ## Home Page Preview
 
-![Home page screenshot](images/home.png)
+![Home page screenshot](images/home-v1.png)
 
 Then open:
 - Home page: http://localhost:8080/
