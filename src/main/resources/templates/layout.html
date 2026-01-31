@@ -4,7 +4,7 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="description" content="Funky Hostel Hub – browse, view and manage hostels easily."/>
-    <meta name="theme-color" content="#6c5ce7"/>
+    <meta name="theme-color" content="#7d6df0"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
     <meta property="og:title" content="Funky Hostel Hub"/>
@@ -18,28 +18,77 @@
     <meta name="twitter:image" content="/icons/social-share.png"/>
     <title>Funky Hostel Hub</title>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
-    <link rel="icon" type="image/svg+xml" href="/images/hostel.svg"/>
+    <!-- Primary favicon (dynamic) -->
+    <link id="favicon" rel="icon" type="image/svg+xml" href="/images/hostel.svg"/>
+    <!-- Shortcut icon for wider compatibility -->
+    <link id="faviconShortcut" rel="shortcut icon" type="image/svg+xml" href="/images/hostel.svg"/>
+    <!-- Static fallbacks based on OS theme (browser may choose these if JS is blocked or during load) -->
+    <link rel="icon" href="/images/hostel.svg" media="(prefers-color-scheme: light)" type="image/svg+xml" sizes="any"/>
+    <link rel="icon" href="/images/hostel-dark.svg" media="(prefers-color-scheme: dark)" type="image/svg+xml"
+          sizes="any"/>
+    <!-- Safari pinned tab (monochrome); color will be updated via JS -->
+    <link id="maskIcon" rel="mask-icon" href="/images/hostel.svg" color="#7d6df0"/>
     <script>
         (function () {
             const root = document.documentElement;
             const themeMeta = document.querySelector('meta[name="theme-color"]');
+            const maskIcon = document.getElementById('maskIcon');
 
             function applyThemeColor(current) {
-                const color = current === 'dark' ? '#1a1d24' : '#6c5ce7';
+                const color = current === 'dark' ? '#1a1d24' : '#7d6df0';
                 if (themeMeta) themeMeta.setAttribute('content', color);
+                if (maskIcon) maskIcon.setAttribute('color', current === 'dark' ? '#ffffff' : '#7d6df0');
             }
 
-            const stored = localStorage.getItem('theme');
-            if (stored) {
-                root.setAttribute('data-theme', stored);
-                applyThemeColor(stored);
+            function applyFavicon(current) {
+                const href = current === 'dark' ? '/images/hostel-dark.svg' : '/images/hostel.svg';
+                const head = document.getElementsByTagName('head')[0];
+                // Replace only our dynamic icons, keep media-based fallbacks intact
+                const oldIcon = document.getElementById('favicon');
+                const oldShortcut = document.getElementById('faviconShortcut');
+                if (oldIcon) oldIcon.parentNode.removeChild(oldIcon);
+                if (oldShortcut) oldShortcut.parentNode.removeChild(oldShortcut);
+                const icon = document.createElement('link');
+                icon.id = 'favicon';
+                icon.rel = 'icon';
+                icon.type = 'image/svg+xml';
+                icon.setAttribute('sizes', 'any');
+                icon.href = href + '?v=' + current + '-' + Date.now();
+                head.appendChild(icon);
+                const shortcut = document.createElement('link');
+                shortcut.id = 'faviconShortcut';
+                shortcut.rel = 'shortcut icon';
+                shortcut.type = 'image/svg+xml';
+                shortcut.setAttribute('sizes', 'any');
+                shortcut.href = icon.href;
+                head.appendChild(shortcut);
             }
+
+            function apply(current) {
+                applyThemeColor(current);
+                applyFavicon(current);
+            }
+
+            // Determine initial theme: stored -> system preference -> light
+            let initial = localStorage.getItem('theme');
+            if (!initial) {
+                try {
+                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        initial = 'dark';
+                    }
+                } catch (_) {
+                }
+            }
+            if (!initial) initial = 'light';
+            root.setAttribute('data-theme', initial);
+            apply(initial);
 
             function toggleTheme() {
                 const current = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
                 root.setAttribute('data-theme', current);
                 localStorage.setItem('theme', current);
-                applyThemeColor(current);
+                apply(current);
+                setTimeout(() => apply(current), 75);
             }
 
             window.__toggleTheme = toggleTheme;

@@ -19,6 +19,11 @@
             <div class="review-tile" th:each="review : ${reviews}">
                 <div class="review-text" th:text="'“' + ${review.text} + '”'"></div>
                 <div class="review-author" th:text="'— ' + ${review.author}"></div>
+                <div class="rating-stars readonly" th:if="${review.rating != null}" th:with="r=${review.rating}">
+                    <span th:each="i : ${#numbers.sequence(1,5)}"
+                          th:classappend="${i <= r} ? 'filled' : 'empty'"
+                          th:text="${i <= r} ? '★' : '☆'">★</span>
+                </div>
                 <div class="review-date" th:text="${#temporals.format(review.created, 'dd-MM-yyyy HH:mm')}"></div>
             </div>
         </div>

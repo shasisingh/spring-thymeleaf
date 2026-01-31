@@ -45,6 +45,7 @@ public class ReviewController {
             return "reviews/create";
         }
         Review review = new Review(form.getText(), form.getAuthor());
+        review.setRating(form.getRating());
         reviewRepository.save(review);
         ra.addFlashAttribute("success", "Thanks for your review!");
         return "redirect:/api/v1/reviews";

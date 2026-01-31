@@ -25,6 +25,10 @@ public class Review {
     @Column(nullable = false, length = 100)
     private String author;
 
+    @Setter
+    @Column
+    private Integer rating;
+
     @Column(nullable = false, updatable = false)
     private java.time.LocalDateTime created;
 
