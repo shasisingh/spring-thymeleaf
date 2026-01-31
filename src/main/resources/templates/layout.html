@@ -66,32 +66,39 @@
 <body>
 <div class="header" role="banner">
     <div class="container header-bar">
-        <nav class="header-nav" role="navigation"><!-- nav removed --></nav>
         <h1>Funky Hostel Hub</h1>
-        <div class="header-actions"><!-- actions kept empty --></div>
+        <nav class="header-nav" role="navigation" aria-label="Primary">
+            <a class="btn" th:href="@{/api/v1}">Home</a>
+            <a class="btn" th:href="@{/api/v1/hostels}">Hostels</a>
+            <a class="btn" th:href="@{/api/v1/rooms}">Rooms</a>
+        </nav>
+        <div class="header-actions"><!-- optional controls --></div>
     </div>
 </div>
 
-<main class="container" role="main">
+<div class="container" role="main">
     <th:block th:insert="${content}"/>
-</main>
+</div>
 
 <div class="footer" role="contentinfo">
     <div class="container">
-        <div class="footer-content">
+        <div class="footer-content" style="justify-content:center; text-align:center;">
             <span>
                 &copy; <span th:text="${#temporals.createNow().getYear()}">2026</span>
                 Funky Hostel Hub — belong to Shashi's Sons
                 <span class="blink" aria-hidden="true">😎</span>
                 <span aria-label="smile">:)</span>
             </span>
-            <div class="actions">
-                <a class="btn" th:href="@{/}">Home</a>
-                <a class="btn" th:href="@{/hostels}">Hostels</a>
-            </div>
         </div>
     </div>
 </div>
+
+<!-- Mobile-only floating footer nav -->
+<nav class="footer-actions-fab" role="navigation" aria-label="Quick navigation" id="mobileFooterNav">
+    <a class="btn" th:href="@{/api/v1}" aria-label="Home">Home</a>
+    <a class="btn" th:href="@{/api/v1/hostels}" aria-label="Hostels">Hostels</a>
+    <a class="btn" th:href="@{/api/v1/rooms}" aria-label="Rooms">Rooms</a>
+</nav>
 
 <button class="btn theme-toggle-fab" type="button" onclick="window.__toggleTheme()" aria-label="Toggle theme">🌓 Toggle
 </button>
@@ -103,12 +110,13 @@
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
     </svg>
 </button>
-<div class="chatbot-modal" id="chatbotModal" style="display:none;">
+<div class="chatbot-modal" id="chatbotModal" style="display:none;" role="dialog" aria-modal="true"
+     aria-labelledby="chatbotModalTitle">
     <div class="chatbot-header">
-        <span>ChatBot</span>
+        <span id="chatbotModalTitle">ChatBot</span>
         <button class="chatbot-close" type="button" aria-label="Close chat" id="chatbotClose">&times;</button>
     </div>
-    <div class="chatbot-body" id="chatbotBody">
+    <div class="chatbot-body" id="chatbotBody" tabindex="0">
         <div class="chatbot-message chatbot-message-bot">Hi! How can I help you?</div>
     </div>
     <form class="chatbot-form" id="chatbotForm" autocomplete="off">
@@ -125,13 +133,42 @@
         const form = document.getElementById('chatbotForm');
         const input = document.getElementById('chatbotInput');
         const body = document.getElementById('chatbotBody');
-        fab.addEventListener('click', () => {
+
+        function trapKeys(e) {
+            if (e.key === 'Escape') {
+                hide();
+            }
+            if (e.key === 'Tab') {
+                const focusables = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                const first = focusables[0];
+                const last = focusables[focusables.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        }
+
+        function show() {
             modal.style.display = 'block';
+            modal.classList.add('show');
             input.focus();
-        });
-        close.addEventListener('click', () => {
+            modal.addEventListener('keydown', trapKeys);
+            document.body.setAttribute('data-modal-open', 'true');
+        }
+
+        function hide() {
+            modal.classList.remove('show');
             modal.style.display = 'none';
-        });
+            modal.removeEventListener('keydown', trapKeys);
+            document.body.removeAttribute('data-modal-open');
+        }
+
+        fab.addEventListener('click', show);
+        close.addEventListener('click', hide);
         form.addEventListener('submit', function (e) {
             e.preventDefault();
             const msg = input.value.trim();
@@ -153,6 +190,184 @@
         });
     })();
 </script>
+<div class="toast-container">
+    <div th:if="${success}" class="toast success">
+        <span class="toast-content">
+            <span class="toast-icon" aria-hidden="true">✔️</span>
+            <span th:text="${success}">Success</span>
+            <button class="toast-close" type="button" aria-label="Dismiss">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </span>
+    </div>
+    <div th:if="${error}" class="toast error">
+        <span class="toast-content">
+            <span class="toast-icon" aria-hidden="true">⚠️</span>
+            <span th:text="${error}">Error</span>
+            <button class="toast-close" type="button" aria-label="Dismiss">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </span>
+    </div>
+    <div th:if="${info}" class="toast info">
+        <span class="toast-content">
+            <span class="toast-icon" aria-hidden="true">ℹ️</span>
+            <span th:text="${info}">Info</span>
+            <button class="toast-close" type="button" aria-label="Dismiss">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </span>
+    </div>
+</div>
+<script>
+    (function () {
+        const toasts = document.querySelectorAll('.toast-container .toast');
+        toasts.forEach((t, idx) => {
+            // show with small stagger
+            setTimeout(() => {
+                t.classList.add('show');
+                // auto hide after 3.5s
+                const hideId = setTimeout(() => {
+                    t.classList.remove('show');
+                    t.remove();
+                }, 3500);
+                // dismiss on click
+                const closeBtn = t.querySelector('.toast-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        clearTimeout(hideId);
+                        t.classList.remove('show');
+                        t.remove();
+                    });
+                }
+            }, idx * 150);
+        });
+    })();
+</script>
+<div id="confirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle"
+     style="display:none;">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title"><span class="modal-title-icon" aria-hidden="true">
+                <!-- warning icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </span>
+            <span id="confirmModalTitle">Confirm Delete</span></span>
+            <button type="button" class="modal-close" id="confirmClose" aria-label="Close">
+                <!-- close icon -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p id="confirmMessage">Are you sure you want to delete this item?</p>
+            <div class="actions" style="margin-top:.75rem; justify-content:flex-end;">
+                <button type="button" class="btn" id="confirmYes">Confirm</button>
+                <button type="button" class="btn" id="confirmNo" style="background:#6c757d">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function () {
+        // Accessible confirmation modal hooking
+        let pendingForm = null;
+        const overlay = document.getElementById('confirmModal');
+        const msgEl = document.getElementById('confirmMessage');
+        const btnYes = document.getElementById('confirmYes');
+        const btnNo = document.getElementById('confirmNo');
+        const btnClose = document.getElementById('confirmClose');
 
+        function openConfirm(message) {
+            msgEl.textContent = message || 'Are you sure you want to delete this item?';
+            overlay.style.display = 'flex';
+            overlay.classList.add('show');
+            btnYes.focus();
+            overlay.addEventListener('keydown', trapKeys);
+            document.body.setAttribute('data-modal-open', 'true');
+        }
+
+        function closeConfirm() {
+            overlay.classList.remove('show');
+            overlay.style.display = 'none';
+            overlay.removeEventListener('keydown', trapKeys);
+            document.body.removeAttribute('data-modal-open');
+            pendingForm = null;
+        }
+
+        function trapKeys(e) {
+            if (e.key === 'Escape') {
+                closeConfirm();
+            }
+            if (e.key === 'Tab') {
+                const focusables = overlay.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                const first = focusables[0];
+                const last = focusables[focusables.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        }
+
+        btnYes.addEventListener('click', function () {
+            if (pendingForm) {
+                const f = pendingForm; // keep ref
+                closeConfirm();
+                // submit after closing to avoid focus issues
+                f.submit();
+            } else {
+                closeConfirm();
+            }
+        });
+
+        function cancel() {
+            closeConfirm();
+        }
+
+        btnNo.addEventListener('click', cancel);
+        btnClose.addEventListener('click', cancel);
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) cancel();
+        });
+
+        function bindDeleteConfirmsAccessible() {
+            document.querySelectorAll('form.confirm-delete').forEach(f => {
+                f.addEventListener('submit', function (e) {
+                    // prevent default and show modal
+                    e.preventDefault();
+                    const message = this.getAttribute('data-confirm') || 'Are you sure you want to delete this item?';
+                    pendingForm = this;
+                    openConfirm(message);
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', bindDeleteConfirmsAccessible);
+    })();
+</script>
 </body>
 </html>

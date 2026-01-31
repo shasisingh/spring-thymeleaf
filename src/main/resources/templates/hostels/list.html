@@ -5,11 +5,13 @@
         <h2>Hostels</h2>
         <div class="actions actions-bar">
             <div class="actions">
-                <a class="btn" th:href="@{/hostels/create}">New Hostel</a>
-                <a class="btn" th:href="@{/hostels/available}">Available</a>
+                <a class="btn" th:href="@{/api/v1/hostels/create}">New Hostel</a>
+                <a class="btn" th:href="@{/api/v1/hostels/available}">Available</a>
+                <a class="btn" th:href="@{/api/v1/hostels}">All</a>
             </div>
             <div class="search-inline" aria-label="Search hostels">
-                <button class="btn search-inline-trigger" type="button" aria-controls="hostel-search" aria-expanded="false">
+                <button class="btn search-inline-trigger" type="button" aria-controls="hostel-search"
+                        aria-expanded="false">
                     Search
                 </button>
                 <label class="search-input">
@@ -25,7 +27,7 @@
                     <th>Name</th>
                     <th>Address</th>
                     <th>Capacity</th>
-                    <th>Price</th>
+                    <th>Rating</th>
                     <th>Status</th>
                     <th></th>
                 </tr>
@@ -35,13 +37,18 @@
                     <td th:text="${h.name}" data-col="name">Name</td>
                     <td th:text="${h.address}" data-col="address">Address</td>
                     <td th:text="${h.capacity}">0</td>
-                    <td class="price-emph" th:text="${'€ ' + #numbers.formatDecimal(h.pricePerNight,1,2)}">€ 0.00</td>
+                    <td class="hostel-rating">
+                        <span th:if="${h.rating != null}">
+                            <span th:each="i : ${#numbers.sequence(1, h.rating != null ? (h.rating.intValue() > 5 ? 5 : (h.rating.intValue() < 0 ? 0 : h.rating.intValue())) : 0)}">&#11088; </span>
+                        </span>
+                        <span th:if="${h.rating == null}">N/A</span>
+                    </td>
                     <td>
                         <span class="status-icon" role="img"
                               th:attr="aria-label=${h.available} ? 'Available' : 'Unavailable', data-tooltip=${h.available} ? 'Available' : 'Unavailable'"
                               th:classappend="${h.available} ? 'ok' : 'bad'"></span>
                     </td>
-                    <td><a th:href="@{|/hostels/${h.id}|}">View</a></td>
+                    <td><a th:href="@{'/api/v1/hostels/' + ${h.id}}" class="btn">View</a></td>
                 </tr>
                 </tbody>
             </table>

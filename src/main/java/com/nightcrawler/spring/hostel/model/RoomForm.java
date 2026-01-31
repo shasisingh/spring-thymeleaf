@@ -6,4 +6,5 @@ import lombok.Data;
 public class RoomForm {
     private Long hostelId;
     private String roomNumber;
+    private RoomType roomType;
 }

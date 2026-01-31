@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,11 +17,19 @@ public class AllocationService {
         repo.save(a);
     }
 
+    public Optional<Allocation> findById(Long id) {
+        return repo.findById(id);
+    }
+
     public List<Allocation> findAll() {
         return repo.findAll();
     }
 
     public List<Allocation> findByHostelId(Long hostelId) {
-        return repo.findByHostelId(hostelId);
+        return repo.findByHostelIdWithRoom(hostelId);
+    }
+
+    public void deleteById(Long id) {
+        repo.deleteById(id);
     }
 }

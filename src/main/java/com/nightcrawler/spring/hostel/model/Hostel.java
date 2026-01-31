@@ -31,13 +31,22 @@ public class Hostel {
     @Column(name = "capacity")
     private int capacity;
 
-    @Column(name = "price_per_night")
-    private double pricePerNight;
-
     @Column(name = "available")
     private boolean available;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "contact_number", length = 32)
+    private String contactNumber;
+
+    @Column(name = "kvk", length = 32)
+    private String kvk;
+
+    @Column(name = "building_type", length = 64)
+    private String buildingType;
+
+    @Column(name = "rating")
+    private Double rating; // out of 5
+    
 }

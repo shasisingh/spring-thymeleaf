@@ -1,105 +1,116 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}" th:inline="javascript">
 <section th:fragment="content">
     <div class="card">
         <h2>Allocate Room</h2>
-        <form th:action="@{/allocations/create}" th:object="${allocation}" method="post" class="form-vertical"
+        <form th:object="${allocation}" th:action="@{/api/v1/allocations/create}" method="post" class="form-vertical"
               id="allocationForm">
             <div class="section-divider">Guest</div>
+            <!-- Guest fields stacked vertically -->
             <label>
-                <span>Full name</span>
+                <span>Full name <span aria-hidden="true" title="Required">*</span></span>
                 <input type="text" th:field="*{fullName}" placeholder="Enter full name" required>
                 <div class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
             </label>
             <label>
-                <span>Email</span>
+                <span>Email <span aria-hidden="true" title="Required">*</span></span>
                 <input type="email" th:field="*{email}" placeholder="Enter email" required>
                 <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                <div class="field-hint">We'll use your email for booking updates only.</div>
             </label>
             <label>
-                <span>Address</span>
+                <span>Address <span aria-hidden="true" title="Required">*</span></span>
                 <input type="text" th:field="*{address}" placeholder="Enter address" required>
                 <div class="field-error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
             </label>
             <label>
-                <span>Date of birth</span>
-                <input type="date" th:field="*{dob}" required>
+                <span>Date of birth <span aria-hidden="true" title="Required">*</span></span>
+                <input type="date" th:field="*{dob}" required
+                       th:value="${#temporals.format(allocation.dob, 'yyyy-MM-dd')}">
                 <div class="field-error" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></div>
             </label>
 
             <div class="section-divider">Payment & Identity</div>
-            <div class="form-row">
-                <label style="flex:1 1 240px">
-                    <span>Identity document</span>
-                    <select th:field="*{identityDoc}" required>
-                        <option value="" disabled selected>Select identity document</option>
-                        <option th:each="idoc : ${identityDocs}" th:value="${idoc}" th:text="${idoc}"></option>
-                    </select>
-                    <div class="field-error" th:if="${#fields.hasErrors('identityDoc')}"
-                         th:errors="*{identityDoc}"></div>
-                </label>
-                <label style="flex:1 1 240px">
-                    <span>Payment method</span>
-                    <select th:field="*{paymentMethod}" required>
-                        <option value="" disabled selected>Select payment method</option>
-                        <option th:each="pm : ${paymentMethods}" th:value="${pm}" th:text="${pm}"></option>
-                    </select>
-                    <div class="field-error" th:if="${#fields.hasErrors('paymentMethod')}"
-                         th:errors="*{paymentMethod}"></div>
-                </label>
-            </div>
+            <!-- Stack identity and payment vertically -->
+            <label>
+                <span>Identity document <span aria-hidden="true" title="Required">*</span></span>
+                <select th:field="*{identityDoc}" required>
+                    <option value="" disabled selected>Select identity document</option>
+                    <option th:each="idoc : ${identityDocs}" th:value="${idoc}" th:text="${idoc}"></option>
+                </select>
+                <div class="field-error" th:if="${#fields.hasErrors('identityDoc')}"
+                     th:errors="*{identityDoc}"></div>
+                <div class="field-hint">Bring this document at check-in.</div>
+            </label>
+            <label>
+                <span>Payment method <span aria-hidden="true" title="Required">*</span></span>
+                <select th:field="*{paymentMethod}" required>
+                    <option value="" disabled selected>Select payment method</option>
+                    <option th:each="pm : ${paymentMethods}" th:value="${pm}" th:text="${pm}"></option>
+                </select>
+                <div class="field-error" th:if="${#fields.hasErrors('paymentMethod')}"
+                     th:errors="*{paymentMethod}"></div>
+            </label>
 
             <div class="section-divider">Stay</div>
-            <div class="form-row">
-                <label style="flex:1 1 240px">
-                    <span>Hostel</span>
-                    <select id="hostelSelect" name="hostelSelect" required>
-                        <option value="" disabled selected>Select hostel</option>
-                        <option th:each="h : ${hostels}" th:value="${h.id}" th:text="${h.name}"></option>
-                    </select>
-                </label>
-                <label style="flex:1 1 240px">
-                    <span>Room number</span>
-                    <input type="text" th:field="*{hostelRoomNumber}" placeholder="e.g., 203A" required>
-                    <div class="field-error" th:if="${#fields.hasErrors('hostelRoomNumber')}"
-                         th:errors="*{hostelRoomNumber}"></div>
-                </label>
-            </div>
-            <div class="form-row">
-                <label style="flex:1 1 240px">
-                    <span>Check-in</span>
-                    <input type="datetime-local" th:field="*{checkIn}" required>
-                    <div class="field-error" th:if="${#fields.hasErrors('checkIn')}" th:errors="*{checkIn}"></div>
-                </label>
-                <label style="flex:1 1 240px">
-                    <span>Check-out</span>
-                    <input type="datetime-local" th:field="*{checkOut}" required>
-                    <div class="field-error" th:if="${#fields.hasErrors('checkOut')}" th:errors="*{checkOut}"></div>
-                </label>
-            </div>
+            <!-- Stack hostel and room vertically -->
             <label>
-                <span>Number of beds</span>
-                <input type="number" th:field="*{numberOfBed}" min="1" step="1" placeholder="e.g., 2" required>
-                <div class="field-error" th:if="${#fields.hasErrors('numberOfBed')}" th:errors="*{numberOfBed}"></div>
+                <span>Hostel <span aria-hidden="true" title="Required">*</span></span>
+                <select th:field="*{hostelId}" id="hostelSelect" name="hostelId" required>
+                    <option value="" disabled
+                            th:selected="${allocation.hostelId == null}">Select hostel
+                    </option>
+                    <option th:each="hostel : ${hostels}" th:value="${hostel.id}" th:text="${hostel.name}"
+                            th:selected="${hostel.id} == ${allocation.hostelId}"></option>
+                </select>
+            </label>
+            <label style="position:relative">
+                <span>Room <span aria-hidden="true" title="Required">*</span> <span id="roomSpinner"
+                                                                                    class="inline-spinner"
+                                                                                    style="display:none"></span></span>
+                <select th:field="*{hostelRoomNumber}" id="roomSelect" name="hostelRoomNumber" required disabled>
+                    <option value="" disabled selected>Select room</option>
+                </select>
+                <!-- overlay spinner inside field -->
+                <span id="roomSelectOverlay" class="inline-spinner"
+                      style="display:none; position:absolute; right:.6rem; top:2.4rem"></span>
+                <input type="hidden" id="roomIdInput" name="roomId" th:value="${selectedRoomId}"/>
+            </label>
+
+            <!-- Stack check-in and check-out vertically -->
+            <label>
+                <span>Check-in <span aria-hidden="true" title="Required">*</span></span>
+                <input type="datetime-local" th:field="*{checkIn}" required
+                       th:value="${#temporals.format(T(java.time.LocalDateTime).now(), 'yyyy-MM-dd''T''HH:mm')}"/>
+                <div class="field-error" th:if="${#fields.hasErrors('checkIn')}" th:errors="*{checkIn}"></div>
+            </label>
+            <label>
+                <span>Check-out <span aria-hidden="true" title="Required">*</span></span>
+                <input type="datetime-local" th:field="*{checkOut}" required
+                       th:value="${#temporals.format(T(java.time.LocalDateTime).now().plusDays(2), 'yyyy-MM-dd''T''HH:mm')}"/>
+                <div class="field-error" th:if="${#fields.hasErrors('checkOut')}" th:errors="*{checkOut}"></div>
             </label>
 
             <div class="actions" style="margin-top:.75rem">
-                <button class="btn" type="submit">Save Allocation</button>
-                <a class="btn" th:href="@{/allocations}" style="background:#6c757d">Cancel</a>
+                <button class="btn" type="submit" id="saveBtn">Save Allocation</button>
+                <a class="btn" th:href="@{/api/v1/allocations}" style="background:#6c757d">Cancel</a>
                 <button class="btn secondary" type="button" id="previewBtn">Preview</button>
             </div>
         </form>
 
-        <div class="card" id="previewCard" style="display:none;">
-            <h3>Summary</h3>
+        <div class="card" id="previewCard" style="display:none;" role="dialog" aria-modal="true"
+             aria-labelledby="previewTitle">
+            <h3 id="previewTitle">Summary</h3>
             <p><strong>Guest:</strong> <span id="prevName"></span> — <span id="prevEmail"></span></p>
             <p><strong>Address:</strong> <span id="prevAddress"></span></p>
             <p><strong>Identity:</strong> <span id="prevIdDoc"></span> | <strong>Payment:</strong> <span
                     id="prevPay"></span></p>
             <p><strong>Hostel:</strong> <span id="prevHostel"></span> | <strong>Room:</strong> <span
                     id="prevRoom"></span></p>
-            <p><strong>Stay:</strong> <span id="prevCheckIn"></span> → <span id="prevCheckOut"></span> |
-                <strong>Beds:</strong> <span id="prevBeds"></span></p>
+            <p><strong>Stay:</strong> <span id="prevCheckIn"></span> → <span id="prevCheckOut"></span></p>
+            <div class="actions">
+                <button class="btn" type="button" id="closePreview">Close</button>
+            </div>
         </div>
     </div>
 
@@ -108,6 +119,7 @@
             const form = document.getElementById('allocationForm');
             const preview = document.getElementById('previewCard');
             const btn = document.getElementById('previewBtn');
+            const closePreview = document.getElementById('closePreview');
             const get = id => document.getElementById(id);
             const fields = {
                 prevName: () => form.querySelector('[name="fullName"]').value,
@@ -118,8 +130,7 @@
                 prevHostel: () => form.querySelector('#hostelSelect').selectedOptions[0]?.textContent || '',
                 prevRoom: () => form.querySelector('[name="hostelRoomNumber"]').value,
                 prevCheckIn: () => form.querySelector('[name="checkIn"]').value,
-                prevCheckOut: () => form.querySelector('[name="checkOut"]').value,
-                prevBeds: () => form.querySelector('[name="numberOfBed"]').value
+                prevCheckOut: () => form.querySelector('[name="checkOut"]').value
             };
 
             function updatePreview() {
@@ -129,10 +140,172 @@
                 });
             }
 
+            // Focus trap for preview "modal"
+            function trapFocus(container) {
+                const focusables = container.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                const first = focusables[0];
+                const last = focusables[focusables.length - 1];
+
+                function handleTab(e) {
+                    if (e.key !== 'Tab') return;
+                    if (e.shiftKey) {
+                        if (document.activeElement === first) {
+                            last.focus();
+                            e.preventDefault();
+                        }
+                    } else {
+                        if (document.activeElement === last) {
+                            first.focus();
+                            e.preventDefault();
+                        }
+                    }
+                }
+
+                container.addEventListener('keydown', handleTab);
+                return () => container.removeEventListener('keydown', handleTab);
+            }
+
+            let releaseTrap = null;
+
             btn?.addEventListener('click', () => {
                 updatePreview();
-                preview.style.display = preview.style.display === 'none' ? 'block' : 'none';
+                const show = preview.style.display === 'none';
+                preview.style.display = show ? 'block' : 'none';
+                if (show) {
+                    preview.setAttribute('aria-hidden', 'false');
+                    releaseTrap = trapFocus(preview);
+                    preview.querySelector('#closePreview').focus();
+                } else {
+                    preview.setAttribute('aria-hidden', 'true');
+                    if (releaseTrap) releaseTrap();
+                    btn.focus();
+                }
             });
+            closePreview?.addEventListener('click', () => {
+                preview.style.display = 'none';
+                preview.setAttribute('aria-hidden', 'true');
+                if (releaseTrap) releaseTrap();
+                btn.focus();
+            });
+
+            // Helpers
+            function toLocalDatetimeValue(date) {
+                const pad = n => String(n).padStart(2, '0');
+                return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+            }
+
+            function formatDdMm(dateStr) {
+                if (!dateStr) return '';
+                const d = new Date(dateStr);
+                const pad = n => String(n).padStart(2, '0');
+                return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            }
+
+            // override preview fill to use dd-MM-yyyy HH:mm
+            fields.prevCheckIn = () => formatDdMm(form.querySelector('[name="checkIn"]').value);
+            fields.prevCheckOut = () => formatDdMm(form.querySelector('[name="checkOut"]').value);
+
+            const hostelSelect = document.getElementById('hostelSelect');
+            const roomSelect = document.getElementById('roomSelect');
+            const hiddenRoomId = document.getElementById('roomIdInput');
+            const roomSpinner = document.getElementById('roomSpinner');
+            const roomSelectOverlay = document.getElementById('roomSelectOverlay');
+            const selectedHostelId = /*[[${selectedHostelId}]]*/ null;
+
+            async function loadRoomsForHostel(hostelId) {
+                roomSelect.innerHTML = '<option value="" disabled selected>Loading...</option>';
+                roomSelect.disabled = true;
+                if (roomSpinner) roomSpinner.style.display = 'inline-block';
+                if (roomSelectOverlay) roomSelectOverlay.style.display = 'inline-block';
+                try {
+                    const res = await fetch(`/api/v1/hostels/${hostelId}/rooms`);
+                    if (!res.ok) throw new Error(`Failed to load rooms (${res.status})`);
+                    const rooms = await res.json();
+                    roomSelect.innerHTML = '<option value="" disabled selected>Select room</option>';
+                    if (Array.isArray(rooms) && rooms.length > 0) {
+                        rooms.forEach(room => {
+                            const opt = document.createElement('option');
+                            const type = room.roomType ? ` (${room.roomType})` : '';
+                            opt.value = room.roomNumber;
+                            opt.textContent = `${room.roomNumber}${type}`;
+                            opt.dataset.roomId = String(room.id);
+                            roomSelect.appendChild(opt);
+                        });
+                        const preselectId = hiddenRoomId?.value;
+                        if (preselectId) {
+                            const match = Array.from(roomSelect.options).find(o => o.dataset.roomId === String(preselectId));
+                            if (match) match.selected = true;
+                        }
+                        roomSelect.disabled = false;
+                    } else {
+                        roomSelect.innerHTML = '<option value="" disabled selected>No rooms available</option>';
+                        roomSelect.disabled = true;
+                        hiddenRoomId.value = '';
+                    }
+                } catch (e) {
+                    roomSelect.innerHTML = '<option value="" disabled selected>Error loading rooms</option>';
+                    roomSelect.disabled = true;
+                    hiddenRoomId.value = '';
+                    console.error(e);
+                } finally {
+                    if (roomSpinner) roomSpinner.style.display = 'none';
+                    if (roomSelectOverlay) roomSelectOverlay.style.display = 'none';
+                }
+            }
+
+            if (hostelSelect && roomSelect) {
+                hostelSelect.addEventListener('change', function () {
+                    const hostelId = this.value;
+                    if (hostelId) {
+                        loadRoomsForHostel(hostelId);
+                    } else {
+                        roomSelect.innerHTML = '<option value="" disabled selected>Select room</option>';
+                        roomSelect.disabled = true;
+                        hiddenRoomId.value = '';
+                    }
+                });
+
+                roomSelect.addEventListener('change', function () {
+                    const selectedOption = roomSelect.selectedOptions[0];
+                    hiddenRoomId.value = (selectedOption && selectedOption.dataset && selectedOption.dataset.roomId) ? selectedOption.dataset.roomId : '';
+                });
+
+                const initialHostelVal = selectedHostelId || hostelSelect.value;
+                if (initialHostelVal) {
+                    hostelSelect.value = String(initialHostelVal);
+                    loadRoomsForHostel(initialHostelVal);
+                }
+            }
+
+            // Fallback default values for datetime fields if empty (browser quirks)
+            const checkInEl = form.querySelector('[name="checkIn"]');
+            const checkOutEl = form.querySelector('[name="checkOut"]');
+            if (checkInEl && !checkInEl.value) {
+                checkInEl.value = toLocalDatetimeValue(new Date());
+            }
+            if (checkOutEl && !checkOutEl.value) {
+                const d = new Date();
+                d.setDate(d.getDate() + 2);
+                checkOutEl.value = toLocalDatetimeValue(d);
+            }
+
+            const dobEl = form.querySelector('[name="dob"]');
+            if (dobEl && !dobEl.value) {
+                const d = new Date();
+                d.setFullYear(d.getFullYear() - 18);
+                const pad = n => String(n).padStart(2, '0');
+                dobEl.value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+            }
+
+            // Success toast hook: intercept submit and show a toast after response if redirected with flash
+            const saveBtn = document.getElementById('saveBtn');
+            form.addEventListener('submit', function () {
+                // allow normal submit; toast will be shown from server flash in layout
+                saveBtn.disabled = true;
+            });
+
+            // Remove beds from preview fields
+            delete fields.prevBeds;
         })();
     </script>
 </section>

@@ -8,7 +8,7 @@
             <span th:text="${success}">Success</span>
         </div>
         <div class="actions" style="margin-bottom:.5rem">
-            <a class="btn" th:href="@{/allocations/create}">New Allocation</a>
+            <a class="btn" th:href="@{/api/v1/allocations/create}">New Allocation</a>
         </div>
         <div class="table-wrap">
             <table class="table">
@@ -18,10 +18,10 @@
                     <th>Email</th>
                     <th>Hostel</th>
                     <th>Room</th>
-                    <th>Beds</th>
                     <th>Check In</th>
                     <th>Check Out</th>
                     <th>Payment</th>
+                    <th class="sticky-right">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -30,10 +30,17 @@
                     <td th:text="${a.email}">Email</td>
                     <td th:text="${a.hostelName}">Hostel</td>
                     <td th:text="${a.hostelRoomNumber}">Room</td>
-                    <td th:text="${a.numberOfBed}">Beds</td>
-                    <td th:text="${#temporals.format(a.checkIn, 'yyyy-MM-dd HH:mm')}">Check In</td>
-                    <td th:text="${#temporals.format(a.checkOut, 'yyyy-MM-dd HH:mm')}">Check Out</td>
+                    <td th:text="${#temporals.format(a.checkIn, 'dd-MM-yyyy HH:mm')}">Check In</td>
+                    <td th:text="${#temporals.format(a.checkOut, 'dd-MM-yyyy HH:mm')}">Check Out</td>
                     <td th:text="${a.paymentMethod}">Payment</td>
+                    <td class="sticky-right">
+                        <form th:action="@{'/api/v1/allocations/' + ${a.id} + '/delete'}" method="post"
+                              class="confirm-delete"
+                              data-confirm="Delete this booking?">
+                            <input type="hidden" name="hostelId" th:value="${a.hostelId}"/>
+                            <button type="submit" class="btn danger">Delete</button>
+                        </form>
+                    </td>
                 </tr>
                 </tbody>
             </table>

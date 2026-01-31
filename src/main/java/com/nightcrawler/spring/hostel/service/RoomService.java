@@ -27,4 +27,8 @@ public class RoomService {
     public Room findById(Long id) {
         return repo.findById(id).orElse(null);
     }
+
+    public long countByHostel(Long hostelId) {
+        return repo.countByHostel_Id(hostelId);
+    }
 }

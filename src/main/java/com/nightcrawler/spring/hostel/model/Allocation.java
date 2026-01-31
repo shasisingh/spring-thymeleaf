@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,13 +52,14 @@ public class Allocation {
     @Column(name = "check_out", nullable = false)
     private LocalDateTime checkOut;
 
-    @Column(name = "number_of_bed", nullable = false)
-    private Integer numberOfBed = 1;
-
     @Column(name = "hostel_name")
     private String hostelName;
 
     @Column(name = "hostel_id")
     private Long hostelId;
+
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room;
 
 }

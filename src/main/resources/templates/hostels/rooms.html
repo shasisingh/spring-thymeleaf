@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+    <div class="card">
+        <h2>Rooms for <span th:text="${hostel != null ? hostel.name : 'Hostel'}">Hostel</span></h2>
+        <div class="actions" style="margin-bottom:.6rem">
+            <a class="btn" th:href="@{'/api/v1/rooms/create'(hostelId=${hostel != null ? hostel.id : null}, ref='rooms')}">Add
+                Room</a>
+            <a class="btn" th:href="@{'/api/v1/hostels/' + ${hostel != null ? hostel.id : 0}}">Back to Hostel</a>
+        </div>
+        <div class="table-wrap" th:if="${rooms != null && !#lists.isEmpty(rooms)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#RoomNumber</th>
+                    <th>Type</th>
+                    <th>Allocated</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${rooms}">
+                    <td th:text="${r.roomNumber}">101</td>
+                    <td><span th:text="${r.roomType}" th:classappend="${'badge room-' + r.roomType}">Type</span></td>
+                    <td>
+                        <span class="badge" th:classappend="${r.allocated ? ' yes' : ' no'}"
+                              th:text="${r.allocated ? '✓' : '✗'}">✗</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${rooms == null || #lists.isEmpty(rooms)}" class="muted">No rooms yet.</div>
+    </div>
+</section>
+</html>

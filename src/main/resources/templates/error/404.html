@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+    <div class="card">
+        <h2>Page Not Found (404)</h2>
+        <p>Sorry, we couldn’t find the page you were looking for.</p>
+        <p>If you typed the address, check the spelling. Otherwise, try one of these:</p>
+        <div class="actions" style="margin-top:.75rem">
+            <a class="btn" th:href="@{/api/v1}">Go to Home</a>
+            <a class="btn" th:href="@{/api/v1/hostels}">Browse Hostels</a>
+            <a class="btn" th:href="@{/api/v1/rooms}">Browse Rooms</a>
+        </div>
+    </div>
+</section>
+</html>

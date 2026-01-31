@@ -10,7 +10,7 @@ A simple hostel manager built with Spring Boot and Thymeleaf. It lets you:
 - Browse hostels, see details, and view currently booked rooms for each hostel.
 - Create, list, and manage room allocations (guests staying in a hostel room).
 - Capture guest info (name, address, DOB), contact (email), identity document type, payment method.
-- Record stay details: hostel, room number, number of beds, check-in and check-out with date+time.
+- Record stay details: hostel, room number, check-in and check-out with date+time.
 - Enjoy a responsive, modern UI (flex-based layout, dark mode toggle, compact header) with a client-side table search on the hostels list.
 
 ## Quick start
@@ -40,7 +40,7 @@ Then open:
 ## Data model (simplified)
 - Hostel: id, name, address, capacity, pricePerNight, available
 - Allocation: id, fullName, address, dob, email, identityDoc, paymentMethod,
-  hostelId, hostelName, hostelRoomNumber, numberOfBed, checkIn (datetime), checkOut (datetime)
+  hostelId, hostelName, hostelRoomNumber, checkIn (datetime), checkOut (datetime)
 
 ## Tech stack
 - Spring Boot, Spring MVC, Thymeleaf 3

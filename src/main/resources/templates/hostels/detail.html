@@ -1,28 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<head>
+    <title th:text="${hostel != null ? hostel.name : 'Hostel Detail'}">Hostel Detail</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
 <section th:fragment="content">
     <div class="card">
         <h2 th:text="${hostel != null ? hostel.name : 'Not found'}">Hostel</h2>
         <div th:if="${hostel == null}"><p>Hostel not found.</p></div>
         <div th:if="${hostel != null}">
-            <div class="form-row">
-                <p style="flex:1"><strong>Address:</strong> <span th:text="${hostel.address}"></span></p>
-                <p style="flex:1"><strong>Capacity:</strong> <span th:text="${hostel.capacity}"></span></p>
+            <div class="hostel-tiles">
+                <div class="hostel-tile">
+                    <span class="tile-label">Address</span>
+                    <span class="tile-value" th:text="${hostel.address}"></span>
+                </div>
+                <div class="hostel-tile">
+                    <span class="tile-label">Capacity</span>
+                    <span class="tile-value" th:text="${hostel.capacity}"></span>
+                </div>
+                <div class="hostel-tile">
+                    <span class="tile-label">Rating</span>
+                    <span class="tile-value" th:text="${hostel.rating != null ? hostel.rating + ' / 5' : 'N/A'}"></span>
+                </div>
+                <div class="hostel-tile">
+                    <span class="tile-label">Status</span>
+                    <span class="tile-value">
+                        <span class="status-icon" role="img"
+                              th:attr="aria-label=${hostel.available} ? 'Available' : 'Unavailable', data-tooltip=${hostel.available} ? 'Available' : 'Unavailable'"
+                              th:classappend="${hostel.available} ? 'ok' : 'bad'"></span>
+                    </span>
+                </div>
+                <div class="hostel-tile">
+                    <span class="tile-label">Contact Number</span>
+                    <span class="tile-value" th:text="${hostel.contactNumber}"></span>
+                </div>
+                <div class="hostel-tile">
+                    <span class="tile-label">KVK</span>
+                    <span class="tile-value" th:text="${hostel.kvk}"></span>
+                </div>
+                <div class="hostel-tile">
+                    <span class="tile-label">Building Type</span>
+                    <span class="tile-value" th:text="${hostel.buildingType}"></span>
+                </div>
+                <div class="hostel-tile">
+                    <span class="tile-label">Created At</span>
+                    <span class="tile-value"
+                          th:text="${#temporals.format(hostel.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                </div>
             </div>
-            <div class="form-row">
-                <p style="flex:1"><strong>Price per night:</strong>
-                    <span th:text="${'€ ' + #numbers.formatDecimal(hostel.pricePerNight,1,2)}"></span>
-                </p>
-                <p style="flex:1"><strong>Status:</strong>
-                    <span class="status-icon" role="img"
-                          th:attr="aria-label=${hostel.available} ? 'Available' : 'Unavailable', data-tooltip=${hostel.available} ? 'Available' : 'Unavailable'"
-                          th:classappend="${hostel.available} ? 'ok' : 'bad'"></span>
-                </p>
-            </div>
-            <form th:action="@{|/hostels/${hostel.id}/delete|}" method="post" class="actions" style="margin-top:1rem"
-                  id="deleteHostelForm">
-                <button class="btn danger" type="submit">Delete</button>
-                <a class="btn" th:href="@{/hostels}" style="background:#6c757d">Back</a>
+            <form th:action="@{'/api/v1/hostels/' + ${hostel.id} + '/delete'}" method="post" class="confirm-delete"
+                  data-confirm="Delete this hostel?">
+                <button class="btn danger" type="submit" th:if="${!(hasRooms or hasAllocations)}">Delete Hostel</button>
+                <button class="btn disabled" type="button" th:if="${hasRooms or hasAllocations}" disabled
+                        th:title="${'Rooms: ' + roomCount + ', Bookings: ' + allocationCount}">
+                    Delete Hostel (disabled)
+                    <span class="badge count-rooms" th:text="${'Rooms: ' + roomCount}" style="margin-left:.5rem"></span>
+                    <span class="badge count-bookings" th:text="${'Bookings: ' + allocationCount}"
+                          style="margin-left:.25rem"></span>
+                </button>
+                <a class="btn" th:href="@{/api/v1/hostels}">Back to Home</a>
             </form>
         </div>
     </div>
@@ -30,28 +66,46 @@
     <div class="card">
         <h3>Booked Rooms</h3>
         <div class="actions" style="margin-bottom:.5rem">
-            <a class="btn" th:href="@{/allocations/create}">Allocate a Room</a>
-            <a class="btn" th:href="@{/rooms/create}">Add Room</a>
-            <span class="muted" th:if="${allocations != null}" th:text="${'Total bookings: ' + allocations.size()}">Total bookings: 0</span>
+            <a class="btn" th:href="@{/api/v1/allocations/create}">Allocate a Room</a>
+            <a class="btn" th:href="@{'/api/v1/rooms/create'(hostelId=${hostel != null ? hostel.id : null})}">Add Room</a>
+            <a class="btn secondary" th:href="@{'/api/v1/hostels/' + ${hostel.id} + '/rooms-page'}">Manage Rooms</a>
         </div>
         <div class="table-wrap" th:if="${allocations != null && !#lists.isEmpty(allocations)}">
             <table class="table">
                 <thead>
                 <tr>
                     <th>Room</th>
+                    <th>Room Type</th>
                     <th>Guest</th>
                     <th>Check In</th>
                     <th>Check Out</th>
-                    <th>Beds</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="a : ${allocations}">
-                    <td th:text="${a.hostelRoomNumber}">Room</td>
+                <tr th:each="a,iter : ${allocations}" th:attr="data-id=${a.id}">
+                    <td th:text="${a.room != null ? a.room.roomNumber : a.hostelRoomNumber}">Room</td>
+                    <td>
+                        <span th:if="${a.room != null}" th:text="${a.room.roomType}"
+                              th:classappend="${'badge room-' + a.room.roomType}">Type</span>
+                        <span th:if="${a.room == null}">N/A</span>
+                    </td>
                     <td th:text="${a.fullName}">Guest</td>
-                    <td th:text="${#temporals.format(a.checkIn, 'yyyy-MM-dd HH:mm')}">Check In</td>
-                    <td th:text="${#temporals.format(a.checkOut, 'yyyy-MM-dd HH:mm')}">Check Out</td>
-                    <td th:text="${a.numberOfBed}">Beds</td>
+                    <td th:text="${#temporals.format(a.checkIn, 'dd-MM-yyyy HH:mm')}">Check In</td>
+                    <td th:text="${#temporals.format(a.checkOut, 'dd-MM-yyyy HH:mm')}">Check Out</td>
+                    <td>
+                        <div class="actions">
+                            <button type="button" class="btn secondary btn-details ellipsis-btn"
+                                    th:attr="data-idx=${iter.index}">...
+                            </button>
+                            <form th:action="@{|/api/v1/allocations/${a.id}/delete|}" method="post"
+                                  class="confirm-delete" data-confirm="Delete this booking?"
+                                  style="display:inline-flex; align-items:center; gap:.25rem">
+                                <input type="hidden" name="hostelId" th:value="${hostel.id}"/>
+                                <button type="submit" class="btn danger" aria-label="Delete allocation">Delete</button>
+                            </form>
+                        </div>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -60,5 +114,89 @@
             No bookings yet for this hostel.
         </div>
     </div>
+    <div id="allocation-modal" class="modal-overlay" role="dialog" aria-modal="true"
+         aria-labelledby="allocationModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <span id="allocationModalTitle" style="font-weight:bold;">Allocation Details</span>
+                <button type="button" class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body-content" tabindex="0"></div>
+        </div>
+    </div>
 </section>
+<script>
+    (function () {
+        function openModalWithHtml(html) {
+            const body = document.getElementById('modal-body-content');
+            const overlay = document.getElementById('allocation-modal');
+            body.innerHTML = html;
+            overlay.classList.add('show');
+            // focus management
+            const closeBtn = overlay.querySelector('.modal-close');
+            closeBtn.focus();
+        }
+
+        function bindEllipsis() {
+            document.querySelectorAll('.btn-details').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const row = this.closest('tr');
+                    const allocationId = row ? row.getAttribute('data-id') : null;
+                    if (!allocationId) return;
+                    fetch(`/api/v1/allocations/${allocationId}`)
+                        .then(r => r.json())
+                        .then(a => {
+                            let html = `<div><strong>Guest:</strong> ${a.fullName} <br/><strong>Email:</strong> ${a.email} <br/><strong>Address:</strong> ${a.address} <br/><strong>DOB:</strong> ${a.dob || ''}</div>`;
+                            html += `<div style='margin-top:0.7em;'><strong>Room:</strong> ${a.room ? a.room.roomNumber : a.hostelRoomNumber} (${a.room ? a.room.roomType : 'N/A'})</div>`;
+                            html += `<div><strong>Check In:</strong> ${a.checkIn} <br/><strong>Check Out:</strong> ${a.checkOut}</div>`;
+                            html += `<div><strong>Identity Doc:</strong> ${a.identityDoc} <br/><strong>Payment:</strong> ${a.paymentMethod}</div>`;
+                            openModalWithHtml(html);
+                        });
+                });
+            });
+        }
+
+        function closeOnOverlayClick() {
+            const overlay = document.getElementById('allocation-modal');
+            overlay && overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) closeModal();
+            });
+            overlay && overlay.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeModal();
+                if (e.key === 'Tab') {
+                    const focusables = overlay.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                    const first = focusables[0];
+                    const last = focusables[focusables.length - 1];
+                    if (e.shiftKey && document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    } else if (!e.shiftKey && document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
+            });
+        }
+
+        window.closeModal = function () {
+            const overlay = document.getElementById('allocation-modal');
+            overlay.classList.remove('show');
+            document.getElementById('modal-body-content').innerHTML = '';
+        };
+        bindEllipsis();
+        closeOnOverlayClick();
+    })();
+
+    // prevent form submit if disabled (extra client-side guard)
+    (function () {
+        const form = document.querySelector('form.confirm-delete[action*="/api/v1/hostels/"]');
+        if (!form) return;
+        const btn = form.querySelector('button[type="submit"]');
+        form.addEventListener('submit', function (e) {
+            if (btn && (btn.getAttribute('disabled') !== null || btn.getAttribute('aria-disabled') === 'true')) {
+                e.preventDefault();
+            }
+        });
+    })();
+</script>
 </html>

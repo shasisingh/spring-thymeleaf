@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+    <div class="card">
+        <h2>Something went wrong</h2>
+        <p>We hit a snag processing your request.</p>
+        <p th:if="${status}">Status: <span th:text="${status}">—</span></p>
+        <p th:if="${error}">Error: <span th:text="${error}">—</span></p>
+        <div class="actions" style="margin-top:.75rem">
+            <a class="btn" th:href="@{/api/v1}">Go to Home</a>
+            <a class="btn" th:href="@{/api/v1/hostels}">Browse Hostels</a>
+            <a class="btn" th:href="@{/api/v1/rooms}">Browse Rooms</a>
+        </div>
+    </div>
+</section>
+</html>

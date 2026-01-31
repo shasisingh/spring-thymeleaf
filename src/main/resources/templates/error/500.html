@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+    <div class="card">
+        <h2>Server Error (500)</h2>
+        <p>Oops. Something went wrong on our side.</p>
+        <p>Please try again later. If the problem persists, contact support.</p>
+        <div class="actions" style="margin-top:.75rem">
+            <a class="btn" th:href="@{/api/v1}">Go to Home</a>
+            <a class="btn" th:href="@{/api/v1/hostels}">Browse Hostels</a>
+            <a class="btn" th:href="@{/api/v1/rooms}">Browse Rooms</a>
+        </div>
+    </div>
+</section>
+</html>

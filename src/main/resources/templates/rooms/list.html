@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+    <div class="card">
+        <h2>Rooms</h2>
+        <div class="actions" style="margin-bottom:.6rem">
+            <a class="btn" th:href="@{/api/v1/rooms/create}">Add Room</a>
+            <a class="btn" th:href="@{/api/v1/hostels}">Back to Hostels</a>
+        </div>
+        <div class="table-wrap" th:if="${rooms != null && !#lists.isEmpty(rooms)}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>RoomNumber</th>
+                    <th>Type</th>
+                    <th>Hostel</th>
+                    <th>Allocated</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${rooms}">
+                    <td th:text="${r.roomNumber}">101</td>
+                    <td>
+                        <span th:text="${r.roomType}" th:classappend="${'badge room-' + r.roomType}">Type</span>
+                    </td>
+                    <td>
+                        <a th:href="@{'/api/v1/hostels/' + ${r.hostel != null ? r.hostel.id : 0}}"
+                           th:text="${r.hostel != null ? r.hostel.name : '—'}">Hostel</a>
+                    </td>
+                    <td>
+                        <span class="badge" th:classappend="${r.allocated ? ' yes' : ' no'}"
+                              th:text="${r.allocated ? '✓' : '✗'}">✗</span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <form th:action="@{'/api/v1/rooms/' + ${r.id} + '/delete'}" method="post" class="confirm-delete"
+                                  data-confirm="Delete this room?" style="display:inline-flex; gap:.25rem; align-items:center">
+                                <input type="hidden" name="hostelId"
+                                       th:value="${r.hostel != null ? r.hostel.id : null}"/>
+                                <button type="submit" class="btn danger" aria-label="Delete room">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${rooms == null || #lists.isEmpty(rooms)}" class="muted">No rooms found.</div>
+    </div>
+</section>
+</html>

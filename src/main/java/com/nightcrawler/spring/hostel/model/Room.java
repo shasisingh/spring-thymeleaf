@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,4 +32,7 @@ public class Room {
     @Column(name = "allocated", nullable = false)
     private boolean allocated = false;
 
+    @Column(name = "room_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoomType roomType = RoomType.SINGLE;
 }

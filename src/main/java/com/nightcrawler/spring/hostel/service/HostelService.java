@@ -8,18 +8,26 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Comparator.comparing;
+
 @Service
 @RequiredArgsConstructor
 public class HostelService {
 
     private final HostelRepository repo;
-    
+
     public List<Hostel> listAll() {
-        return repo.findAll();
+        return repo.findAll()
+                .stream()
+                .sorted(comparing(Hostel::getName))
+                .toList();
     }
 
     public List<Hostel> listAvailable() {
-        return repo.findByAvailableTrue();
+        return repo.findByAvailableTrue()
+                .stream()
+                .sorted(comparing(Hostel::getName))
+                .toList();
     }
 
     public void save(Hostel hostel) {

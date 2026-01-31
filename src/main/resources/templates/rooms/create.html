@@ -1,27 +1,51 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:replace="~{layout :: layout(~{::content})}">
 <head>
     <title>Add Room</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 <body>
-<div class="container">
-    <h2>Add New Room</h2>
-    <form th:action="@{/rooms/create}" th:object="${roomForm}" method="post">
-        <div class="form-row">
-            <label for="hostelId">Hostel</label>
-            <select id="hostelId" th:field="*{hostelId}" required>
-                <option th:each="hostel : ${hostels}" th:value="${hostel.id}" th:text="${hostel.name}"></option>
-            </select>
-        </div>
-        <div class="form-row">
-            <label for="roomNumber">Room Number</label>
-            <input type="text" id="roomNumber" th:field="*{roomNumber}" required />
-        </div>
-        <div class="form-row">
-            <button class="btn" type="submit">Add Room</button>
-        </div>
-    </form>
-</div>
+<section th:fragment="content">
+    <div class="card">
+        <h2>Add New Room</h2>
+        <form th:action="@{/api/v1/rooms/create}" th:object="${roomForm}" method="post" class="form-vertical">
+            <label>
+                <span>Hostel</span>
+                <select id="hostelId" th:field="*{hostelId}" required>
+                    <option th:each="hostel : ${hostels}"
+                            th:value="${hostel.id}"
+                            th:text="${hostel.name}"
+                            th:selected="${roomForm != null and roomForm.hostelId != null and hostel.id == roomForm.hostelId}"></option>
+                </select>
+            </label>
+            <label>
+                <span>Room Number</span>
+                <input type="text" id="roomNumber" th:field="*{roomNumber}" required/>
+            </label>
+            <label>
+                <span>Room Type</span>
+                <select id="roomType" th:field="*{roomType}" required>
+                    <option th:each="type : ${T(com.nightcrawler.spring.hostel.model.RoomType).values()}"
+                            th:value="${type}" th:text="${type}"></option>
+                </select>
+            </label>
+            <div class="actions" style="margin-top:.75rem">
+                <button class="btn" type="submit">Add Room</button>
+                <a class="btn"
+                   th:if="${ref == 'rooms' and roomForm != null and roomForm.hostelId != null}"
+                   th:href="@{'/api/v1/hostels/' + ${roomForm.hostelId} + '/rooms-page'}"
+                   style="background:#6c757d">Cancel</a>
+                <a class="btn"
+                   th:if="${ref != 'rooms' and roomForm != null and roomForm.hostelId != null}"
+                   th:href="@{'/api/v1/hostels/' + ${roomForm.hostelId}}"
+                   style="background:#6c757d">Cancel</a>
+                <a class="btn"
+                   th:if="${roomForm == null or roomForm.hostelId == null}"
+                   th:href="@{/api/v1/hostels}"
+                   style="background:#6c757d">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
 </body>
 </html>
