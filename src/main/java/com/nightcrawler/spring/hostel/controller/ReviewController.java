@@ -24,7 +24,6 @@ public class ReviewController {
 
     @GetMapping
     public String list(Model model) {
-        // For global list, no pagination currently; pass as null for fragment compatibility
         model.addAttribute("reviews", reviewService.findAll());
         model.addAttribute("reviewPage", null);
         return "reviews/list";
