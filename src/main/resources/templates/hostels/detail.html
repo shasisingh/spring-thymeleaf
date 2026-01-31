@@ -47,6 +47,10 @@
                     <span class="tile-value"
                           th:text="${#temporals.format(hostel.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </div>
+                <div class="hostel-tile">
+                    <span class="tile-label">Reviews</span>
+                    <span class="tile-value" th:text="${reviewCount != null ? reviewCount : 0}">0</span>
+                </div>
             </div>
             <form th:action="@{'/api/v1/hostels/' + ${hostel.id} + '/delete'}" method="post" class="confirm-delete"
                   data-confirm="Delete this hostel?">
@@ -123,6 +127,42 @@
             </div>
             <div class="modal-body" id="modal-body-content" tabindex="0"></div>
         </div>
+    </div>
+
+    <div class="card" th:if="${hostel != null}">
+        <h3>Guest Reviews</h3>
+        <div class="review-tiles" th:if="${reviews != null && !#lists.isEmpty(reviews)}">
+            <div class="review-tile" th:each="r : ${reviews}">
+                <div class="review-text" th:text="'“' + ${r.text} + '”'"></div>
+                <div class="review-author" th:text="'— ' + ${r.author}"></div>
+                <div class="review-date" th:text="${#temporals.format(r.created, 'dd-MM-yyyy HH:mm')}"></div>
+            </div>
+        </div>
+        <div th:if="${reviews == null || #lists.isEmpty(reviews)}" class="muted">No reviews yet. Be the first to leave one!</div>
+
+        <div class="pagination" th:if="${reviewPage != null and reviewPage.totalPages > 1}" style="margin:.5rem 0; display:flex; gap:.25rem; align-items:center;">
+            <a class="btn" th:classappend="${reviewPage.first}? ' disabled' : ''"
+               th:href="@{'/api/v1/hostels/' + ${hostel.id} + '(page=' + ${reviewPage.number - 1} + ')'}" th:if="${!reviewPage.first}">Prev</a>
+            <span class="muted">Page <span th:text="${reviewPage.number + 1}">1</span> of <span th:text="${reviewPage.totalPages}">1</span></span>
+            <a class="btn" th:classappend="${reviewPage.last}? ' disabled' : ''"
+               th:href="@{'/api/v1/hostels/' + ${hostel.id} + '(page=' + ${reviewPage.number + 1} + ')'}" th:if="${!reviewPage.last}">Next</a>
+        </div>
+
+        <form th:action="@{'/api/v1/hostels/' + ${hostel.id} + '/reviews'}" th:object="${reviewForm}" method="post" class="form-vertical" style="margin-top:.75rem">
+            <label>
+                <span>Your Name</span>
+                <input type="text" th:field="*{author}" maxlength="100" required>
+                <span class="error" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></span>
+            </label>
+            <label>
+                <span>Your Review</span>
+                <textarea th:field="*{text}" rows="4" maxlength="500" required></textarea>
+                <span class="error" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></span>
+            </label>
+            <div class="actions" style="margin-top:.5rem">
+                <button class="btn" type="submit">Submit Review</button>
+            </div>
+        </form>
     </div>
 </section>
 <script>

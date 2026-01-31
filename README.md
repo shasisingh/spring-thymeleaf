@@ -28,6 +28,8 @@ Then open:
 - Hostels list: http://localhost:8080/api/v1/hostels
 - Allocations: http://localhost:8080/api/v1/allocations
 - Create allocation: http://localhost:8080/api/v1/allocations/create
+- Reviews list: http://localhost:8080/api/v1/reviews
+- Create review: http://localhost:8080/api/v1/reviews/create
 
 ## Key routes
 - GET /api/v1 — home page
@@ -40,11 +42,15 @@ Then open:
 - GET /api/v1/allocations — list allocations
 - GET /api/v1/allocations/create — allocation form
 - POST /api/v1/allocations/create — save allocation
+- GET /api/v1/reviews — list guest reviews
+- GET /api/v1/reviews/create — write a review
+- POST /api/v1/reviews/create — submit a review
 
 ## Data model (simplified)
 - Hostel: id, name, address, capacity, pricePerNight, available
 - Allocation: id, fullName, address, dob, email, identityDoc, paymentMethod,
   hostelId, hostelName, hostelRoomNumber, checkIn (datetime), checkOut (datetime)
+- Review: id, author, text, created
 
 ## Tech stack
 - Spring Boot, Spring MVC, Thymeleaf 3
@@ -85,6 +91,8 @@ Click a thumbnail to open the page when the app is running.
 - [Hostel detail](http://localhost:8080/api/v1/hostels/1)
 - [Allocations list](http://localhost:8080/api/v1/allocations)
 - [Create allocation](http://localhost:8080/api/v1/allocations/create)
+- [Reviews list](http://localhost:8080/api/v1/reviews)
+- [Create review](http://localhost:8080/api/v1/reviews/create)
 
 | Hostels list | Hostel detail | Allocations list | Create allocation |
 | --- | --- | --- | --- |

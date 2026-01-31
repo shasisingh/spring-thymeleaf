@@ -2,19 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
 <section th:fragment="content">
     <div class="card">
-        <h2>Welcome</h2>
-        <p>
-            <a class="btn" th:href="@{/api/v1/hostels}">Browse Hostels</a>
-            <a class="btn" th:href="@{/api/v1/hostels/create}">Add Hostel</a>
-            <a class="btn" th:href="@{/api/v1/allocations}">Manage Allocations</a>
-            <a class="btn" th:href="@{/api/v1/rooms}">Browse Rooms</a>
-            <a class="btn" th:href="@{/api/v1/rooms/create}">Add Room</a>
-            <a class="btn" th:href="@{/api/v1/reviews}">View Reviews</a>
+        <h2>Guest Reviews</h2>
+        <div class="actions" style="margin-bottom:.75rem">
             <a class="btn" th:href="@{/api/v1/reviews/create}">Write a Review</a>
-        </p>
-    </div>
-    <div class="review-footer">
-        <h3>What our guests are saying...</h3>
+            <a class="btn" th:href="@{/api/v1}" style="background:#6c757d">Back to Home</a>
+        </div>
         <div class="review-tiles">
             <div class="review-tile" th:each="review : ${reviews}">
                 <div class="review-text" th:text="'“' + ${review.text} + '”'"></div>
@@ -22,6 +14,7 @@
                 <div class="review-date" th:text="${#temporals.format(review.created, 'dd-MM-yyyy HH:mm')}"></div>
             </div>
         </div>
+        <div th:if="${reviews == null || #lists.isEmpty(reviews)}" class="muted">No reviews yet.</div>
     </div>
 </section>
 </html>

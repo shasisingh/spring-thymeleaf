@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,6 +27,11 @@ public class Review {
 
     @Column(nullable = false, updatable = false)
     private java.time.LocalDateTime created;
+
+    @ManyToOne
+    @JoinColumn(name = "hostel_id")
+    @Setter
+    private Hostel hostel;
 
     public Review() {
     }

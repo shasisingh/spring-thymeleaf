@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+    <div class="card">
+        <h2>Leave a Review</h2>
+        <form th:action="@{/api/v1/reviews/create}" th:object="${reviewForm}" method="post" class="form-vertical">
+            <label>
+                <span>Your Name</span>
+                <input type="text" th:field="*{author}" maxlength="100" required>
+                <span class="error" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></span>
+            </label>
+            <label>
+                <span>Your Review</span>
+                <textarea th:field="*{text}" rows="5" maxlength="500" required></textarea>
+                <span class="error" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></span>
+            </label>
+            <div class="actions" style="margin-top:.75rem">
+                <button class="btn" type="submit">Submit Review</button>
+                <a class="btn" th:href="@{/api/v1/reviews}" style="background:#6c757d">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+</html>
