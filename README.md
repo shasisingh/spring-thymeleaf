@@ -1,5 +1,5 @@
 # Read Me First
-This is a fun project made just to learn Spring and Thymeleaf.
+This project is a simple hostel management app created for learning purposes with Spring Boot and Thymeleaf. It is not intended for production use or serious deployment. Feel free to explore, modify, and use it as a resource for learning! The app demonstrates basic features and possibilities with Spring Boot and Thymeleaf.
 
 ## Requirements
 - Java 25 or newer (with virtual thread support)
