@@ -4,7 +4,9 @@ import com.nightcrawler.spring.hostel.model.Allocation;
 import com.nightcrawler.spring.hostel.service.AllocationService;
 import com.nightcrawler.spring.hostel.service.HostelService;
 import com.nightcrawler.spring.hostel.service.RoomService;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,54 +35,25 @@ public class AllocationController {
     @GetMapping("/create")
     public String createForm(@RequestParam(value = "hostelId", required = false) Long hostelId,
                              Model model) {
-        var allocation = new Allocation();
-        // Set sensible defaults for datetime fields
-        var now = LocalDateTime.now().withSecond(0).withNano(0);
-        allocation.setCheckIn(now);
-        allocation.setDob(now.minusYears(18).toLocalDate());
-        allocation.setCheckOut(now.plusDays(2));
-        if (hostelId != null) {
-            allocation.setHostelId(hostelId);
-        }
-        model.addAttribute("allocation", allocation);
-        model.addAttribute("identityDocs", List.of("Passport", "ID Card", "Driver License"));
-        model.addAttribute("paymentMethods", List.of("Cash", "Card", "Online"));
-        model.addAttribute("hostels", hostelService.listAvailable());
-        if (hostelId != null) {
-            model.addAttribute("rooms", roomService.availableByHostel(hostelId));
-            model.addAttribute("selectedHostelId", hostelId);
-        } else {
-            model.addAttribute("rooms", List.of());
-        }
+        allocationService.createDefaultForm(hostelId, model);
         return "allocations/create";
     }
+
 
     @PostMapping("/create")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String createSubmit(@ModelAttribute("allocation") Allocation allocation,
                                BindingResult result,
                                Model model,
-                               @RequestParam(name = "hostelId", required = false) Long hostelId,
-                               @RequestParam(value = "roomId", required = false) Long roomId,
+                               @RequestParam(name = "hostelId") @NotNull Long hostelId,
+                               @RequestParam(value = "roomId") @NotNull Long roomId,
                                RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            model.addAttribute("identityDocs", List.of("Passport", "ID Card", "Driver License"));
-            model.addAttribute("paymentMethods", List.of("Cash", "Card", "Online"));
-            model.addAttribute("hostels", hostelService.listAvailable());
-            if (hostelId != null) {
-                model.addAttribute("rooms", roomService.availableByHostel(hostelId));
-                model.addAttribute("selectedHostelId", hostelId);
-            } else {
-                model.addAttribute("rooms", List.of());
-            }
-            if (roomId != null) {
-                model.addAttribute("selectedRoomId", roomId);
-            }
-            return "allocations/create";
+            return returnError(model, hostelId, roomId);
         }
-
-        LocalDateTime in = allocation.getCheckIn();
-        LocalDateTime out = allocation.getCheckOut();
+        
+        var in = allocation.getCheckIn();
+        var out = allocation.getCheckOut();
         if (in != null && out != null && (out.isBefore(in) || out.isEqual(in))) {
             result.rejectValue("checkOut", "invalid", "Check-out must be after check-in");
             model.addAttribute("identityDocs", List.of("Passport", "ID Card", "Driver License"));
@@ -88,43 +61,28 @@ public class AllocationController {
             model.addAttribute("hostels", hostelService.listAvailable());
             return "allocations/create";
         }
-        if (hostelId != null) {
-            hostelService.findById(hostelId)
-                    .ifPresent(hostel -> {
-                        allocation.setHostelName(hostel.getName());
-                        allocation.setHostelId(hostel.getId());
-                        var room = roomService.findById(roomId);
-                        if (room != null && room.isAllocated()) {
-                            result.rejectValue("hostelRoomNumber", "allocated", "Selected room is already allocated");
-                        }
-                        allocation.setRoom(room);
-                        if (room != null && !result.hasErrors()) {
-                            room.setAllocated(true);
-                            roomService.save(room);
-                            allocation.setHostelRoomNumber(room.getRoomNumber());
-                        }
-                    });
-        }
-        if (result.hasErrors()) {
-            model.addAttribute("identityDocs", List.of("Passport", "ID Card", "Driver License"));
-            model.addAttribute("paymentMethods", List.of("Cash", "Card", "Online"));
-            model.addAttribute("hostels", hostelService.listAvailable());
-            if (hostelId != null) {
-                model.addAttribute("rooms", roomService.availableByHostel(hostelId));
-                model.addAttribute("selectedHostelId", hostelId);
-            } else {
-                model.addAttribute("rooms", List.of());
-            }
-            if (roomId != null) {
-                model.addAttribute("selectedRoomId", roomId);
-            }
-            return "allocations/create";
-        }
+
+        hostelService.findById(hostelId)
+                .ifPresent(hostel -> {
+                    allocation.setHostelName(hostel.getName());
+                    allocation.setHostelId(hostel.getId());
+                    var room = roomService.findById(roomId);
+                    if (room != null && room.isAllocated()) {
+                        result.rejectValue("hostelRoomNumber", "allocated", "Selected room is already allocated");
+                    }
+                    allocation.setRoom(room);
+                    if (room != null && !result.hasErrors()) {
+                        room.setAllocated(true);
+                        roomService.save(room);
+                        allocation.setHostelRoomNumber(room.getRoomNumber());
+                    }
+                });
+
         allocationService.save(allocation);
         redirectAttributes.addFlashAttribute("success", "Allocation created successfully");
         return "redirect:/api/v1/allocations";
     }
-
+    
     @GetMapping
     public String list(Model model) {
         model.addAttribute("allocations", allocationService.findAll());
@@ -134,8 +92,8 @@ public class AllocationController {
     @PostMapping("/{id}/delete")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String delete(@PathVariable Long id,
-                         @RequestParam(name = "hostelId", required = false) Long hostelId,
-                         org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
+                         @RequestParam(name = "hostelId") Long hostelId,
+                         RedirectAttributes ra) {
         try {
             allocationService.findById(id)
                     .ifPresent(a -> {
@@ -155,4 +113,16 @@ public class AllocationController {
         }
         return "redirect:/api/v1/allocations";
     }
+
+    private @NonNull String returnError(Model model, Long hostelId, Long roomId) {
+        model.addAttribute("identityDocs", List.of("Passport", "ID Card", "Driver License"));
+        model.addAttribute("paymentMethods", List.of("Cash", "Card", "Online"));
+        model.addAttribute("hostels", hostelService.listAvailable());
+        model.addAttribute("rooms", roomService.availableByHostel(hostelId));
+        model.addAttribute("selectedHostelId", hostelId);
+        model.addAttribute("selectedRoomId", roomId);
+
+        return "allocations/create";
+    }
+
 }

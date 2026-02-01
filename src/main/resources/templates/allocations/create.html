@@ -1,10 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}" th:inline="javascript">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}" th:inline="javascript"
+      lang="en">
 <section th:fragment="content">
     <div class="card">
         <h2>Allocate Room</h2>
         <form th:object="${allocation}" th:action="@{/api/v1/allocations/create}" method="post" class="form-vertical"
               id="allocationForm">
+            <div class="section-divider">Stay</div>
+            <!-- Stack hostel and room vertically -->
+            <label>
+                <span>Hostel <span aria-hidden="true" title="Required">*</span></span>
+                <select th:field="*{hostelId}" id="hostelSelect" name="hostelId" required>
+                    <option value="" disabled
+                            th:selected="${allocation.hostelId == null}">Select hostel
+                    </option>
+                    <option th:each="hostel : ${hostels}" th:value="${hostel.id}" th:text="${hostel.name}"
+                            th:selected="${hostel.id} == ${allocation.hostelId}"></option>
+                </select>
+            </label>
+            <label style="position:relative">
+                <span>Room <span aria-hidden="true" title="Required">*</span> <span id="roomSpinner"
+                                                                                    class="inline-spinner"
+                                                                                    style="display:none"></span></span>
+                <select th:field="*{hostelRoomNumber}" id="roomSelect" name="hostelRoomNumber" required disabled>
+                    <option value="" disabled selected>Select room</option>
+                </select>
+                <!-- overlay spinner inside field -->
+                <span id="roomSelectOverlay" class="inline-spinner"
+                      style="display:none; position:absolute; right:.6rem; top:2.4rem"></span>
+                <input type="hidden" id="roomIdInput" name="roomId" th:value="${selectedRoomId}"/>
+            </label>
+
+            <!-- Stack check-in and check-out vertically -->
+            <label>
+                <span>Check-in <span aria-hidden="true" title="Required">*</span></span>
+                <input type="datetime-local" th:field="*{checkIn}" required
+                       th:value="${#temporals.format(T(java.time.LocalDateTime).now(), 'yyyy-MM-dd''T''HH:mm')}"/>
+                <div class="field-error" th:if="${#fields.hasErrors('checkIn')}" th:errors="*{checkIn}"></div>
+            </label>
+            <label>
+                <span>Check-out <span aria-hidden="true" title="Required">*</span></span>
+                <input type="datetime-local" th:field="*{checkOut}" required
+                       th:value="${#temporals.format(T(java.time.LocalDateTime).now().plusDays(2), 'yyyy-MM-dd''T''HH:mm')}"/>
+                <div class="field-error" th:if="${#fields.hasErrors('checkOut')}" th:errors="*{checkOut}"></div>
+            </label>
+
             <div class="section-divider">Guest</div>
             <!-- Guest fields stacked vertically -->
             <label>
@@ -50,45 +90,6 @@
                 </select>
                 <div class="field-error" th:if="${#fields.hasErrors('paymentMethod')}"
                      th:errors="*{paymentMethod}"></div>
-            </label>
-
-            <div class="section-divider">Stay</div>
-            <!-- Stack hostel and room vertically -->
-            <label>
-                <span>Hostel <span aria-hidden="true" title="Required">*</span></span>
-                <select th:field="*{hostelId}" id="hostelSelect" name="hostelId" required>
-                    <option value="" disabled
-                            th:selected="${allocation.hostelId == null}">Select hostel
-                    </option>
-                    <option th:each="hostel : ${hostels}" th:value="${hostel.id}" th:text="${hostel.name}"
-                            th:selected="${hostel.id} == ${allocation.hostelId}"></option>
-                </select>
-            </label>
-            <label style="position:relative">
-                <span>Room <span aria-hidden="true" title="Required">*</span> <span id="roomSpinner"
-                                                                                    class="inline-spinner"
-                                                                                    style="display:none"></span></span>
-                <select th:field="*{hostelRoomNumber}" id="roomSelect" name="hostelRoomNumber" required disabled>
-                    <option value="" disabled selected>Select room</option>
-                </select>
-                <!-- overlay spinner inside field -->
-                <span id="roomSelectOverlay" class="inline-spinner"
-                      style="display:none; position:absolute; right:.6rem; top:2.4rem"></span>
-                <input type="hidden" id="roomIdInput" name="roomId" th:value="${selectedRoomId}"/>
-            </label>
-
-            <!-- Stack check-in and check-out vertically -->
-            <label>
-                <span>Check-in <span aria-hidden="true" title="Required">*</span></span>
-                <input type="datetime-local" th:field="*{checkIn}" required
-                       th:value="${#temporals.format(T(java.time.LocalDateTime).now(), 'yyyy-MM-dd''T''HH:mm')}"/>
-                <div class="field-error" th:if="${#fields.hasErrors('checkIn')}" th:errors="*{checkIn}"></div>
-            </label>
-            <label>
-                <span>Check-out <span aria-hidden="true" title="Required">*</span></span>
-                <input type="datetime-local" th:field="*{checkOut}" required
-                       th:value="${#temporals.format(T(java.time.LocalDateTime).now().plusDays(2), 'yyyy-MM-dd''T''HH:mm')}"/>
-                <div class="field-error" th:if="${#fields.hasErrors('checkOut')}" th:errors="*{checkOut}"></div>
             </label>
 
             <div class="actions" style="margin-top:.75rem">

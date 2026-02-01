@@ -7,44 +7,42 @@
 </head>
 <body>
 <section th:fragment="content">
-    <div class="container">
-        <div class="card" style="max-width:640px; margin:0 auto;">
-            <h2 class="card-title">Write a Review</h2>
-            <div class="form-group" th:if="${hostels != null and !#lists.isEmpty(hostels)}">
-                <label for="hostelId">Hostel (optional)</label>
-                <select id="hostelId" name="hostelId">
-                    <option value="" selected>— None —</option>
-                    <option th:each="h : ${hostels}" th:value="${h.id}" th:text="${h.name}"></option>
-                </select>
-                <small class="form-help">Pick a hostel from your bookings to tie your review to it (optional).</small>
-            </div>
-            <!-- Reuse global review form fragment, submitting to guest endpoint -->
-            <div th:replace="~{fragments/reviews :: reviewForm(@{/api/v1/guest/reviews/create}, ~{::#extraHostelId})}"></div>
-            <div id="extraHostelId" th:fragment="extraHostelId">
-                <input type="hidden" name="hostelId"/>
-            </div>
-            <script>
-                // Sync selected hostelId into hidden input inside the fragment form
-                (function () {
-                    const select = document.getElementById('hostelId');
+    <div class="card" style="max-width:640px; margin:0 auto;">
+        <h2 class="card-title">Write a Review</h2>
+        <div class="form-group" th:if="${hostels != null and !#lists.isEmpty(hostels)}">
+            <label for="hostelId">Hostel</label>
+            <select id="hostelId" name="hostelId" required>
+                <option th:each="h : ${hostels}" th:value="${h.id}" th:text="${h.name}">
+                </option>
+            </select>
+            <small class="form-help">Pick a hostel from your bookings to tie your review to it.</small>
+        </div>
+        <!-- Reuse global review form fragment, submitting to guest endpoint -->
+        <div th:replace="~{fragments/reviews :: reviewForm(@{/api/v1/guest/reviews/create}, ~{::#extraHostelId})}"></div>
+        <div id="extraHostelId" th:fragment="extraHostelId">
+            <input type="hidden" name="hostelId" required/>
+        </div>
+        <script>
+            // Sync selected hostelId into hidden input inside the fragment form
+            (function () {
+                const select = document.getElementById('hostelId');
 
-                    function sync() {
-                        const hidden = document.querySelector('form input[name="hostelId"]');
-                        if (hidden) {
-                            hidden.value = select ? select.value : '';
-                        }
+                function sync() {
+                    const hidden = document.querySelector('form input[name="hostelId"]');
+                    if (hidden) {
+                        hidden.value = select ? select.value : '';
                     }
+                }
 
-                    if (select) {
-                        select.addEventListener('change', sync);
-                        // initialize
-                        sync();
-                    }
-                })();
-            </script>
-            <div class="actions" style="margin-top:.75rem">
-                <a class="btn secondary" th:href="@{/api/v1/guest/my-reviews}">Back to My Reviews</a>
-            </div>
+                if (select) {
+                    select.addEventListener('change', sync);
+                    // initialize
+                    sync();
+                }
+            })();
+        </script>
+        <div class="actions" style="margin-top:.75rem">
+            <a class="btn secondary" th:href="@{/api/v1/guest/my-reviews}">Back to My Reviews</a>
         </div>
     </div>
 </section>

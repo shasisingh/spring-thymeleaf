@@ -70,7 +70,8 @@
     <div class="card">
         <h3>Booked Rooms</h3>
         <div class="actions" style="margin-bottom:.5rem">
-            <a class="btn" th:href="@{/api/v1/allocations/create}">Allocate a Room</a>
+            <!-- Pass hostelId to preselect hostel on allocation form -->
+            <a class="btn" th:href="@{'/api/v1/allocations/create'(hostelId=${hostel != null ? hostel.id : null})}">Allocate a Room</a>
             <a class="btn" th:href="@{'/api/v1/rooms/create'(hostelId=${hostel != null ? hostel.id : null})}">Add
                 Room</a>
             <a class="btn secondary" th:href="@{'/api/v1/hostels/' + ${hostel.id} + '/rooms-page'}">Manage Rooms</a>
