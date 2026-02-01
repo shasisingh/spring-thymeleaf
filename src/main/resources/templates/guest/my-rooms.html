@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<head>
+    <meta charset="UTF-8">
+    <title>My Rooms</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<section th:fragment="content">
+    <div class="container">
+        <div class="card" style="max-width:960px; margin:0 auto;">
+            <h2 class="card-title">My Booked Rooms</h2>
+            <div class="actions" style="margin-bottom:.75rem">
+                <a class="btn" th:href="@{/api/v1/guest/logout}">Logout</a>
+                <a class="btn secondary" th:href="@{/api/v1/guest/reviews/create}">Write a review</a>
+                <a class="btn secondary" th:href="@{/api/v1/guest/my-reviews}">My Reviews</a>
+            </div>
+            <div th:if="${#lists.isEmpty(allocations)}">No bookings found for your email.</div>
+            <div th:if="${!#lists.isEmpty(allocations)}" style="overflow:auto;">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Hostel</th>
+                        <th>Room</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="a : ${allocations}">
+                        <td th:text="${a.hostelName}"></td>
+                        <td th:text="${a.hostelRoomNumber}"></td>
+                        <td th:text="${#temporals.format(a.checkIn, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:text="${#temporals.format(a.checkOut, 'yyyy-MM-dd HH:mm')}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

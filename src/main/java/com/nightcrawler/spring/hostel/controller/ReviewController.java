@@ -30,9 +30,9 @@ public class ReviewController {
     }
 
     @GetMapping("/create")
-    public String createForm(Model model) {
-        model.addAttribute("reviewForm", new ReviewForm());
-        return "reviews/create";
+    public String createForm(RedirectAttributes ra) {
+        ra.addFlashAttribute("info", "Please log in as a guest to write a review.");
+        return "redirect:/api/v1/guest/login";
     }
 
     @PostMapping("/create")
@@ -40,11 +40,7 @@ public class ReviewController {
     public String create(@Valid @ModelAttribute("reviewForm") ReviewForm form,
                          BindingResult result,
                          RedirectAttributes ra) {
-        if (result.hasErrors()) {
-            return "reviews/create";
-        }
-        reviewService.createWithoutHostel(form);
-        ra.addFlashAttribute("success", "Thanks for your review!");
-        return "redirect:/api/v1/reviews";
+        ra.addFlashAttribute("info", "Please log in as a guest to write a review.");
+        return "redirect:/api/v1/guest/login";
     }
 }

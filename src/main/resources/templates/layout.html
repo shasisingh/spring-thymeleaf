@@ -40,8 +40,22 @@
             <a class="btn" th:href="@{/api/v1/hostels}">Hostels</a>
             <a class="btn" th:href="@{/api/v1/rooms}">Rooms</a>
             <a class="btn" th:href="@{/api/v1/reviews}">Reviews</a>
+            <!-- Guest portal links -->
+            <a class="btn" th:if="${guestSession} == null or ${guestSession.email} == null"
+               th:href="@{/api/v1/guest/login}">Guest Login</a>
+            <span th:if="${guestSession} != null and ${guestSession.email} != null">
+                <a class="btn" th:href="@{/api/v1/guest/my-rooms}">My Rooms</a>
+                <a class="btn" th:href="@{/api/v1/guest/my-reviews}">My Reviews</a>
+                <a class="btn" th:href="@{/api/v1/guest/logout}">Logout</a>
+            </span>
         </nav>
-        <div class="header-actions"><!-- optional controls --></div>
+        <div class="header-actions">
+            <!-- Conditional logged-in indicator: prefer name else email -->
+            <span th:if="${guestSession} != null and ${guestSession.email} != null"
+                  th:with="guestDisplayName=${(guestSession.name != null and !#strings.isEmpty(guestSession.name)) ? guestSession.name : guestSession.email}">
+                Logged in as <strong th:text="${guestDisplayName}"></strong>
+            </span>
+        </div>
     </div>
 </div>
 
@@ -68,6 +82,14 @@
     <a class="btn" th:href="@{/api/v1/hostels}" aria-label="Hostels">Hostels</a>
     <a class="btn" th:href="@{/api/v1/rooms}" aria-label="Rooms">Rooms</a>
     <a class="btn" th:href="@{/api/v1/reviews}" aria-label="Reviews">Reviews</a>
+    <!-- Guest portal links -->
+    <a class="btn" th:if="${guestSession} == null or ${guestSession.email} == null" th:href="@{/api/v1/guest/login}"
+       aria-label="Guest Login">Guest</a>
+    <span th:if="${guestSession} != null and ${guestSession.email} != null">
+        <a class="btn" th:href="@{/api/v1/guest/my-rooms}" aria-label="My Rooms">Rooms</a>
+        <a class="btn" th:href="@{/api/v1/guest/my-reviews}" aria-label="My Reviews">Reviews</a>
+        <a class="btn" th:href="@{/api/v1/guest/logout}" aria-label="Logout">Logout</a>
+    </span>
 </nav>
 
 <!-- Show toggle only if theme script is present -->

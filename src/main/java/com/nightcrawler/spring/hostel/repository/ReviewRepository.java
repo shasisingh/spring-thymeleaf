@@ -17,4 +17,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     long countByHostel_Id(Long hostelId);
 
     Page<Review> findByHostel_Id(Long hostelId, Pageable pageable);
+
+    // New: find reviews by author (guest email)
+    List<Review> findByAuthorOrderByCreatedDesc(String author);
+
+    // New: find reviews where author matches any in the provided list
+    List<Review> findByAuthorInOrderByCreatedDesc(List<String> authors);
 }

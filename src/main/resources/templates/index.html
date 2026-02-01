@@ -10,8 +10,21 @@
             <a class="btn" th:href="@{/api/v1/rooms}">Browse Rooms</a>
             <a class="btn" th:href="@{/api/v1/rooms/create}">Add Room</a>
             <a class="btn" th:href="@{/api/v1/reviews}">View Reviews</a>
-            <a class="btn" th:href="@{/api/v1/reviews/create}">Write a Review</a>
+            <!-- Guest portal entry -->
+            <a class="btn" th:if="${guestSession} == null or ${guestSession.email} == null" th:href="@{/api/v1/guest/login}">Guest Login</a>
+            <span th:if="${guestSession} != null and ${guestSession.email} != null">
+                <a class="btn" th:href="@{/api/v1/guest/my-rooms}">My Rooms</a>
+                <a class="btn" th:href="@{/api/v1/guest/my-reviews}">My Reviews</a>
+            </span>
         </p>
+    </div>
+    <!-- Guest quick tips/prompt -->
+    <div class="toast info" th:if="${guestSession} == null or ${guestSession.email} == null" style="margin-top:.75rem">
+        <span class="toast-content">
+            <span class="toast-icon" aria-hidden="true">ℹ️</span>
+            <span>Log in via the Guest portal to access your rooms and write reviews.</span>
+            <a class="btn" style="margin-left:.5rem" th:href="@{/api/v1/guest/login}">Guest Login</a>
+        </span>
     </div>
     <div class="review-footer">
         <h3>What our guests are saying...</h3>

@@ -12,4 +12,7 @@ public interface AllocationRepository extends JpaRepository<Allocation, Long> {
 
     @Query("SELECT a FROM Allocation a LEFT JOIN FETCH a.room WHERE a.hostelId = :hostelId")
     List<Allocation> findByHostelIdWithRoom(@Param("hostelId") Long hostelId);
+
+    // Find allocations by guest email
+    List<Allocation> findByEmail(String email);
 }

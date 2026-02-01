@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+    <div class="container">
+        <div class="card" style="max-width:960px; margin:0 auto;">
+            <h2 class="card-title">My Reviews</h2>
+            <div class="actions" style="margin-bottom:.75rem">
+                <a class="btn" th:href="@{/api/v1/guest/reviews/create}">Write a Review</a>
+                <a class="btn secondary" th:href="@{/api/v1/guest/my-rooms}">Back to My Rooms</a>
+            </div>
+            <div th:replace="~{fragments/reviews :: reviewList(${reviews}, ${reviewPage})}"></div>
+        </div>
+    </div>
+</section>
+</html>

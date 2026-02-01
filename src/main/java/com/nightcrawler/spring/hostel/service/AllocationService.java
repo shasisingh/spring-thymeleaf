@@ -32,4 +32,9 @@ public class AllocationService {
     public void deleteById(Long id) {
         repo.deleteById(id);
     }
+
+    // New: find allocations by guest email
+    public List<Allocation> findByEmail(String email) {
+        return repo.findByEmail(email);
+    }
 }

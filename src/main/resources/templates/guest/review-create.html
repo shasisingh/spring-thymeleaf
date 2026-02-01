@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Write Review</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<section th:fragment="content">
+    <div class="container">
+        <div class="card" style="max-width:640px; margin:0 auto;">
+            <h2 class="card-title">Write a Review</h2>
+            <div class="form-group" th:if="${hostels != null and !#lists.isEmpty(hostels)}">
+                <label for="hostelId">Hostel (optional)</label>
+                <select id="hostelId" name="hostelId">
+                    <option value="" selected>— None —</option>
+                    <option th:each="h : ${hostels}" th:value="${h.id}" th:text="${h.name}"></option>
+                </select>
+                <small class="form-help">Pick a hostel from your bookings to tie your review to it (optional).</small>
+            </div>
+            <!-- Reuse global review form fragment, submitting to guest endpoint -->
+            <div th:replace="~{fragments/reviews :: reviewForm(@{/api/v1/guest/reviews/create})}"></div>
+            <div class="actions" style="margin-top:.75rem">
+                <a class="btn secondary" th:href="@{/api/v1/guest/my-reviews}">Back to My Reviews</a>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -3,9 +3,22 @@
 <section th:fragment="content">
     <div class="card">
         <h2>Guest Reviews</h2>
+        <!-- Prompt non-logged-in users to log in to write a review -->
+        <div class="toast info" th:if="${guestSession} == null" style="margin-bottom:.75rem">
+            <span class="toast-content">
+                <span class="toast-icon" aria-hidden="true">ℹ️</span>
+                <span>You need to log in via the Guest portal to write a review.</span>
+                <a class="btn" style="margin-left:.5rem" th:href="@{/api/v1/guest/login}">Guest Login</a>
+            </span>
+        </div>
         <div class="actions" style="margin-bottom:.75rem">
-            <a class="btn" th:href="@{/api/v1/reviews/create}">Write a Review</a>
-            <a class="btn" th:href="@{/api/v1}" style="background:#6c757d">Back to Home</a>
+            <!-- Show write review only when guest is logged in, and use guest-protected endpoint -->
+            <a class="btn"
+               th:if="${guestSession} != null"
+               th:href="@{/api/v1/guest/reviews/create}">Write a Review</a>
+            <a class="btn secondary" th:href="@{/api/v1}">Back to Home</a>
+            <a class="btn secondary" th:if="${guestSession} != null"
+               th:href="@{/api/v1/guest/my-reviews}">My Reviews</a>
         </div>
         <div th:replace="~{fragments/reviews :: reviewList(${reviews}, ${reviewPage})}"></div>
     </div>

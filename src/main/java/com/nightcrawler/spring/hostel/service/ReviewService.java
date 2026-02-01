@@ -48,4 +48,12 @@ public class ReviewService {
     public List<Review> findAll() {
         return reviewRepository.findAll(Sort.by(Sort.Direction.DESC, "created"));
     }
+
+    public List<Review> findByAuthor(String author) {
+        return reviewRepository.findByAuthorOrderByCreatedDesc(author);
+    }
+
+    public List<Review> findByAuthors(List<String> authors) {
+        return reviewRepository.findByAuthorInOrderByCreatedDesc(authors);
+    }
 }

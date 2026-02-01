@@ -3,10 +3,11 @@
 <section th:fragment="content">
     <div class="card">
         <h2>Leave a Review</h2>
-        <div th:replace="~{fragments/reviews :: reviewForm(@{/api/v1/reviews/create})}"></div>
+        <p>You need to log in via the Guest portal to write a review.</p>
         <div class="actions" style="margin-top:.75rem">
-            <a class="btn" th:href="@{/api/v1/reviews}" style="background:#6c757d">Back to Reviews</a>
-            <a class="btn" th:href="@{/api/v1}" style="background:#6c757d">Home</a>
+            <a class="btn" th:href="@{/api/v1/guest/login}">Guest Login</a>
+            <a class="btn secondary" th:href="@{/api/v1/reviews}">Back to Reviews</a>
+            <a class="btn secondary" th:href="@{/api/v1}">Home</a>
         </div>
     </div>
 </section>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Guest Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<section th:fragment="content">
+    <div class="container">
+        <div class="card" style="max-width:520px; margin:0 auto;">
+            <h2 class="card-title" style="text-align:center;">Guest Login</h2>
+
+            <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+            <div th:if="${success}" class="alert alert-success" role="status" th:text="${success}"></div>
+
+            <form id="guestLoginForm" th:action="@{/api/v1/guest/login}" method="post" autocomplete="on">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-with-icon">
+                        <input id="email" name="email" type="email" placeholder="you@example.com" required
+                               autocomplete="email"/>
+                    </div>
+                    <small class="form-help">Use the email you booked with to view your rooms and write reviews.</small>
+                </div>
+
+                <div class="actions" style="justify-content:center;">
+                    <button id="loginBtn" type="submit" class="btn" aria-label="Login to view your bookings">Login
+                    </button>
+                    <a class="btn secondary" th:href="@{/api/v1/reviews}">Guest Reviews</a>
+                </div>
+            </form>
+
+            <script>
+                (function () {
+                    const form = document.getElementById('guestLoginForm');
+                    const btn = document.getElementById('loginBtn');
+                    if (form && btn) {
+                        form.addEventListener('submit', function () {
+                            btn.disabled = true;
+                            btn.textContent = 'Logging in…';
+                        });
+                    }
+                })();
+            </script>
+        </div>
+    </div>
+</section>
+</body>
+</html>

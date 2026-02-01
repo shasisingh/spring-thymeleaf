@@ -3,7 +3,7 @@
 <body>
 <!-- Fragment: review list -->
 <div th:fragment="reviewList(reviews, reviewPage)">
-    <div class="review-tiles" th:if="${reviews != null && !#lists.isEmpty(reviews)}">
+    <div class="review-tiles" th:if="${reviews != null and !#lists.isEmpty(reviews)}">
         <div class="review-tile" th:each="r : ${reviews}">
             <div class="review-text" th:text="'“' + ${r.text} + '”'"></div>
             <div class="review-author" th:text="'— ' + ${r.author}"></div>
@@ -15,9 +15,7 @@
             <div class="review-date" th:text="${#temporals.format(r.created, 'dd-MM-yyyy HH:mm')}"></div>
         </div>
     </div>
-    <div th:if="${reviews == null || #lists.isEmpty(reviews)}" class="muted">No reviews yet. Be the first to leave
-        one!
-    </div>
+    <div th:if="${reviews == null or #lists.isEmpty(reviews)}" class="muted">No reviews yet. Be the first to leave one!</div>
 
     <div class="pagination" th:if="${reviewPage != null and reviewPage.totalPages > 1}"
          style="margin:.5rem 0; display:flex; gap:.25rem; align-items:center;">
@@ -33,37 +31,69 @@
 <!-- Fragment: review form: uses standard model attribute 'reviewForm' -->
 <div th:fragment="reviewForm(formAction)">
     <form th:object="${reviewForm}"
-          th:action="${formAction}" method="post" class="form-vertical" style="margin-top:.75rem">
-        <label>
+          th:action="${formAction}" method="post" class="form-vertical" style="margin-top:.75rem"
+          th:with="safeRating=${(reviewForm != null and reviewForm.rating != null) ? reviewForm.rating : 0}">
+        <!-- If guest logged in, prefer name and hide input -->
+        <div th:if="${#ctx.containsVariable('guestSession') and guestSession != null and guestSession.email != null}"
+             th:with="guestDisplayName=${(guestSession.name != null and !#strings.isEmpty(guestSession.name)) ? guestSession.name : guestSession.email}">
+            <span class="form-help">Logged in as <strong th:text="${guestDisplayName}"></strong>. Your review will be posted under this name.</span>
+            <input type="hidden" name="author" th:value="${guestDisplayName}" />
+        </div>
+        <label th:if="${!#ctx.containsVariable('guestSession') or guestSession == null or guestSession.email == null}">
             <span>Your Name</span>
-            <input type="text" th:field="*{author}" maxlength="100" required>
-            <span class="error" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></span>
+            <input type="text" name="author" th:value="${(reviewForm != null and reviewForm.author != null) ? reviewForm.author : ''}" maxlength="100" required>
         </label>
         <label>
             <span>Your Review</span>
-            <textarea th:field="*{text}" rows="4" maxlength="500" required></textarea>
-            <span class="error" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></span>
+            <textarea name="text" rows="4" maxlength="500" required th:text="${(reviewForm != null and reviewForm.text != null) ? reviewForm.text : ''}"></textarea>
         </label>
         <label>
-            <span>Your Rating</span>
-            <div class="rating-stars" aria-label="Rating out of 5">
-                <input type="radio" th:field="*{rating}" value="5" id="frag-star5"><label for="frag-star5"
-                                                                                          title="5 stars">★</label>
-                <input type="radio" th:field="*{rating}" value="4" id="frag-star4"><label for="frag-star4"
-                                                                                          title="4 stars">★</label>
-                <input type="radio" th:field="*{rating}" value="3" id="frag-star3"><label for="frag-star3"
-                                                                                          title="3 stars">★</label>
-                <input type="radio" th:field="*{rating}" value="2" id="frag-star2"><label for="frag-star2"
-                                                                                          title="2 stars">★</label>
-                <input type="radio" th:field="*{rating}" value="1" id="frag-star1"><label for="frag-star1"
-                                                                                          title="1 star">★</label>
+            <span class="sr-only">Your Rating</span>
+            <div class="rating-stars" aria-label="Rating out of 5" id="fragRatingStars">
+                <input type="radio" name="rating" value="1" id="frag-star1" th:checked="${safeRating == 1}"><label for="frag-star1" data-index="1">★</label>
+                <input type="radio" name="rating" value="2" id="frag-star2" th:checked="${safeRating == 2}"><label for="frag-star2" data-index="2">★</label>
+                <input type="radio" name="rating" value="3" id="frag-star3" th:checked="${safeRating == 3}"><label for="frag-star3" data-index="3">★</label>
+                <input type="radio" name="rating" value="4" id="frag-star4" th:checked="${safeRating == 4}"><label for="frag-star4" data-index="4">★</label>
+                <input type="radio" name="rating" value="5" id="frag-star5" th:checked="${safeRating == 5}"><label for="frag-star5" data-index="5">★</label>
             </div>
-            <span class="error" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}"></span>
         </label>
         <div class="actions" style="margin-top:.5rem">
             <button class="btn" type="submit">Submit Review</button>
         </div>
     </form>
+    <script>
+        (function(){
+            const wrap = document.getElementById('fragRatingStars');
+            if(!wrap) return;
+            const labels = Array.from(wrap.querySelectorAll('label'));
+            const inputs = Array.from(wrap.querySelectorAll('input[type="radio"]'));
+            function setActive(n){
+                labels.forEach(l => {
+                    const idx = parseInt(l.getAttribute('data-index'), 10);
+                    l.style.color = (idx <= n) ? '#f59e0b' : '#d1d5db';
+                });
+            }
+            // Initialize from checked input
+            const checked = inputs.find(i => i.checked);
+            setActive(checked ? parseInt(checked.value, 10) : 0);
+            // Hover preview
+            labels.forEach(l => {
+                l.addEventListener('mouseenter', () => setActive(parseInt(l.getAttribute('data-index'), 10)));
+                l.addEventListener('mouseleave', () => {
+                    const cur = inputs.find(i => i.checked);
+                    setActive(cur ? parseInt(cur.value, 10) : 0);
+                });
+                l.addEventListener('click', () => {
+                    const forId = l.getAttribute('for');
+                    const input = wrap.querySelector(`#${forId}`);
+                    if(input){
+                        input.checked = true;
+                        setActive(parseInt(input.value, 10));
+                    }
+                });
+            });
+        })();
+    </script>
 </div>
 </body>
 </html>
