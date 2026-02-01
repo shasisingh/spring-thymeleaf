@@ -48,5 +48,5 @@ public class Hostel {
 
     @Column(name = "rating")
     private Double rating; // out of 5
-    
+
 }

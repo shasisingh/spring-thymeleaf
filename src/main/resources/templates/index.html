@@ -11,7 +11,8 @@
             <a class="btn" th:href="@{/api/v1/rooms/create}">Add Room</a>
             <a class="btn" th:href="@{/api/v1/reviews}">View Reviews</a>
             <!-- Guest portal entry -->
-            <a class="btn" th:if="${guestSession} == null or ${guestSession.email} == null" th:href="@{/api/v1/guest/login}">Guest Login</a>
+            <a class="btn" th:if="${guestSession} == null or ${guestSession.email} == null"
+               th:href="@{/api/v1/guest/login}">Guest Login</a>
             <span th:if="${guestSession} != null and ${guestSession.email} != null">
                 <a class="btn" th:href="@{/api/v1/guest/my-rooms}">My Rooms</a>
                 <a class="btn" th:href="@{/api/v1/guest/my-reviews}">My Reviews</a>

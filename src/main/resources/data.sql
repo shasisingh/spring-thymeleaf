@@ -67,55 +67,61 @@ VALUES ('Backpackers Inn', '12 Hill St', 0, TRUE, CURRENT_TIMESTAMP, '0612345678
 
 CREATE TABLE IF NOT EXISTS REVIEW
 (
-    id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    text    VARCHAR(500) NOT NULL,
-    author  VARCHAR(100) NOT NULL,
-    rating  INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
-    created TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    text      VARCHAR(500) NOT NULL,
+    author    VARCHAR(100) NOT NULL,
+    rating    INT          NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    created   TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     hostel_id BIGINT,
-    CONSTRAINT fk_review_hostel FOREIGN KEY (hostel_id) REFERENCES HOSTEL(id)
+    CONSTRAINT fk_review_hostel FOREIGN KEY (hostel_id) REFERENCES HOSTEL (id)
 );
 
 INSERT INTO REVIEW (text, author, rating, created)
-VALUES ('I came for the WiFi, I stayed for the free breakfast. 10/10, would nap again!', 'Sleepy Sam', 5, CURRENT_TIMESTAMP),
+VALUES ('I came for the WiFi, I stayed for the free breakfast. 10/10, would nap again!', 'Sleepy Sam', 5,
+        CURRENT_TIMESTAMP),
        ('Lost my socks, found new friends. Hostel magic!', 'Wanderlust Wendy', 4, CURRENT_TIMESTAMP),
        ('Showers hotter than my love life. Highly recommend.', 'Steamy Steve', 5, CURRENT_TIMESTAMP),
        ('Beds so comfy, I missed my train. Twice.', 'Snooze Cruise', 4, CURRENT_TIMESTAMP),
        ('Staff laughed at my jokes. Or maybe at my hair. Either way, 5 stars!', 'Punny Paul', 5, CURRENT_TIMESTAMP),
-       ('I thought I was checking into a movie set. Turns out, it was just this awesome hostel!', 'Leonardo DiCaprio', 5, CURRENT_TIMESTAMP),
+       ('I thought I was checking into a movie set. Turns out, it was just this awesome hostel!', 'Leonardo DiCaprio',
+        5, CURRENT_TIMESTAMP),
        ('Even my entourage was impressed. And they are hard to please.', 'Dwayne Johnson', 4, CURRENT_TIMESTAMP),
        ('I asked for a quiet room. They gave me a fan club instead!', 'Tom Holland', 3, CURRENT_TIMESTAMP),
-       ('The only thing missing was a red carpet. But the breakfast made up for it.', 'Scarlett Johansson', 4, CURRENT_TIMESTAMP),
-       ('I came for a night, stayed for a week. My agent is still looking for me.', 'Ryan Reynolds', 5, CURRENT_TIMESTAMP),
+       ('The only thing missing was a red carpet. But the breakfast made up for it.', 'Scarlett Johansson', 4,
+        CURRENT_TIMESTAMP),
+       ('I came for a night, stayed for a week. My agent is still looking for me.', 'Ryan Reynolds', 5,
+        CURRENT_TIMESTAMP),
        ('If hostels gave Oscars, this one would win Best Picture.', 'Meryl Streep', 5, CURRENT_TIMESTAMP),
        ('I tried to go incognito, but the staff recognized me by my laugh.', 'Will Smith', 4, CURRENT_TIMESTAMP),
        ('I’ve stayed in five-star hotels, but this place has five-star vibes.', 'Zendaya', 5, CURRENT_TIMESTAMP),
        ('The only drama here is who gets the top bunk.', 'Chris Hemsworth', 4, CURRENT_TIMESTAMP),
        ('I’d film my next blockbuster here if I could.', 'Gal Gadot', 5, CURRENT_TIMESTAMP);
 
-CREATE TABLE IF NOT EXISTS ROOM (
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS ROOM
+(
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     room_number VARCHAR(32) NOT NULL,
-    hostel_id BIGINT NOT NULL,
-    allocated BOOLEAN NOT NULL DEFAULT FALSE,
-    room_type VARCHAR(32) NOT NULL,
-    CONSTRAINT fk_room_hostel FOREIGN KEY (hostel_id) REFERENCES HOSTEL(id)
+    hostel_id   BIGINT      NOT NULL,
+    allocated   BOOLEAN     NOT NULL DEFAULT FALSE,
+    room_type   VARCHAR(32) NOT NULL,
+    CONSTRAINT fk_room_hostel FOREIGN KEY (hostel_id) REFERENCES HOSTEL (id)
 );
 
-CREATE TABLE IF NOT EXISTS ALLOCATION (
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    full_name VARCHAR(255) NOT NULL,
-    address VARCHAR(255) NOT NULL,
-    dob DATE NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    identity_doc VARCHAR(64) NOT NULL,
-    payment_method VARCHAR(32) NOT NULL,
-    hostel_room_number VARCHAR(32) NOT NULL,
-    check_in TIMESTAMP NOT NULL,
-    check_out TIMESTAMP NOT NULL,
-    hostel_name VARCHAR(255),
-    hostel_id BIGINT,
-    room_id BIGINT,
-    CONSTRAINT fk_allocation_hostel FOREIGN KEY (hostel_id) REFERENCES HOSTEL(id),
-    CONSTRAINT fk_allocation_room FOREIGN KEY (room_id) REFERENCES ROOM(id)
+CREATE TABLE IF NOT EXISTS ALLOCATION
+(
+    id                 BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    full_name          VARCHAR(255) NOT NULL,
+    address            VARCHAR(255) NOT NULL,
+    dob                DATE         NOT NULL,
+    email              VARCHAR(255) NOT NULL,
+    identity_doc       VARCHAR(64)  NOT NULL,
+    payment_method     VARCHAR(32)  NOT NULL,
+    hostel_room_number VARCHAR(32)  NOT NULL,
+    check_in           TIMESTAMP    NOT NULL,
+    check_out          TIMESTAMP    NOT NULL,
+    hostel_name        VARCHAR(255),
+    hostel_id          BIGINT,
+    room_id            BIGINT,
+    CONSTRAINT fk_allocation_hostel FOREIGN KEY (hostel_id) REFERENCES HOSTEL (id),
+    CONSTRAINT fk_allocation_room FOREIGN KEY (room_id) REFERENCES ROOM (id)
 );

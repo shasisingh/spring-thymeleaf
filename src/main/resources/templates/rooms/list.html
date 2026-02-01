@@ -34,8 +34,10 @@
                     </td>
                     <td>
                         <div class="actions">
-                            <form th:action="@{'/api/v1/rooms/' + ${r.id} + '/delete'}" method="post" class="confirm-delete"
-                                  data-confirm="Delete this room?" style="display:inline-flex; gap:.25rem; align-items:center">
+                            <form th:action="@{'/api/v1/rooms/' + ${r.id} + '/delete'}" method="post"
+                                  class="confirm-delete"
+                                  data-confirm="Delete this room?"
+                                  style="display:inline-flex; gap:.25rem; align-items:center">
                                 <input type="hidden" name="hostelId"
                                        th:value="${r.hostel != null ? r.hostel.id : null}"/>
                                 <button type="submit" class="btn danger" aria-label="Delete room">Delete</button>

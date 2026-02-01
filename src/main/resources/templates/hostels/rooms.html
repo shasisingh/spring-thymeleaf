@@ -4,7 +4,8 @@
     <div class="card">
         <h2>Rooms for <span th:text="${hostel != null ? hostel.name : 'Hostel'}">Hostel</span></h2>
         <div class="actions" style="margin-bottom:.6rem">
-            <a class="btn" th:href="@{'/api/v1/rooms/create'(hostelId=${hostel != null ? hostel.id : null}, ref='rooms')}">Add
+            <a class="btn"
+               th:href="@{'/api/v1/rooms/create'(hostelId=${hostel != null ? hostel.id : null}, ref='rooms')}">Add
                 Room</a>
             <a class="btn" th:href="@{'/api/v1/hostels/' + ${hostel != null ? hostel.id : 0}}">Back to Hostel</a>
         </div>

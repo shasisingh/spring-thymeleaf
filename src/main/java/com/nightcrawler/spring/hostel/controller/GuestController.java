@@ -10,6 +10,8 @@ import com.nightcrawler.spring.hostel.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,12 +34,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GuestController {
 
+    private static final long LOGIN_COOLDOWN_MS = 30_000L;
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+
     private final AllocationService allocationService;
     private final ReviewService reviewService;
     private final HostelService hostelService;
     private final Map<String, Long> lastLoginAttempt = new ConcurrentHashMap<>();
-    private static final long LOGIN_COOLDOWN_MS = 30_000L;
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 
     @ModelAttribute("guestSession")
     public GuestSession guestSession() {
@@ -110,8 +113,12 @@ public class GuestController {
         }
         // Fetch reviews by both guest name and email to cover all cases
         var authors = new java.util.ArrayList<String>();
-        if (guestSession.getEmail() != null) authors.add(guestSession.getEmail());
-        if (guestSession.getName() != null && !guestSession.getName().isBlank()) authors.add(guestSession.getName());
+        if (guestSession.getEmail() != null) {
+            authors.add(guestSession.getEmail());
+        }
+        if (guestSession.getName() != null && !guestSession.getName().isBlank()) {
+            authors.add(guestSession.getName());
+        }
         model.addAttribute("reviews", reviewService.findByAuthors(authors));
         model.addAttribute("reviewPage", null);
         return "guest/my-reviews";
@@ -132,12 +139,13 @@ public class GuestController {
         var hostels = hostelIds.stream()
                 .map(id -> hostelService.findById(id).orElse(null))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
         model.addAttribute("hostels", hostels);
         return "guest/review-create";
     }
 
     @PostMapping("/reviews/create")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String createReview(@ModelAttribute("guestSession") GuestSession guestSession,
                                @Valid @ModelAttribute("reviewForm") ReviewForm form,
                                BindingResult result,

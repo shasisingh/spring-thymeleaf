@@ -1,5 +1,6 @@
 package com.nightcrawler.spring.hostel.controller;
 
+import com.nightcrawler.spring.hostel.model.GuestSession;
 import com.nightcrawler.spring.hostel.model.Hostel;
 import com.nightcrawler.spring.hostel.model.ReviewForm;
 import com.nightcrawler.spring.hostel.service.AllocationService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/api/v1/hostels")
@@ -51,7 +53,7 @@ public class HostelController {
 
     @PostMapping("/create")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public String createSubmit(@ModelAttribute Hostel hostel, Errors errors, org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
+    public String createSubmit(@ModelAttribute Hostel hostel, Errors errors, RedirectAttributes ra) {
         if (errors.hasErrors()) {
             return "hostels/create";
         }
@@ -64,29 +66,9 @@ public class HostelController {
     public String detail(@PathVariable Long id, Model model,
                          @RequestParam(name = "page", required = false, defaultValue = "0") int page) {
         populateHostelDetail(id, page, model);
+        // Provide a review form for adding a review to this hostel
+        model.addAttribute("reviewForm", new ReviewForm());
         return "hostels/detail";
-    }
-
-    @PostMapping("/{id}/reviews")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public String addReview(@PathVariable Long id,
-                            @Valid @ModelAttribute("reviewForm") ReviewForm form,
-                            BindingResult result,
-                            Model model,
-                            org.springframework.web.servlet.mvc.support.RedirectAttributes ra,
-                            @RequestParam(name = "page", required = false, defaultValue = "0") int page) {
-        var hostelOpt = service.findById(id);
-        if (hostelOpt.isEmpty()) {
-            ra.addFlashAttribute("error", "Hostel not found");
-            return "redirect:/api/v1/hostels";
-        }
-        if (result.hasErrors()) {
-            populateHostelDetail(id, page, model);
-            return "hostels/detail";
-        }
-        reviewService.createForHostel(form, hostelOpt.get());
-        ra.addFlashAttribute("success", "Thanks for your review!");
-        return "redirect:/api/v1/hostels/" + id;
     }
 
     @GetMapping("/{id}/rooms-page")
@@ -99,7 +81,7 @@ public class HostelController {
 
     @PostMapping("/{id}/delete")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public String delete(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
+    public String delete(@PathVariable Long id, RedirectAttributes ra) {
         // Block delete if rooms exist or allocations present
         boolean hasRooms = false;
         try {
@@ -121,6 +103,35 @@ public class HostelController {
         return "redirect:/api/v1/hostels";
     }
 
+    @PostMapping("/{id}/reviews/create")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public String createReviewForHostel(@PathVariable Long id,
+                                        @ModelAttribute("guestSession") GuestSession guestSession,
+                                        @Valid @ModelAttribute("reviewForm") ReviewForm form,
+                                        BindingResult result,
+                                        RedirectAttributes ra,
+                                        Model model) {
+        var hostelOpt = service.findById(id);
+        if (hostelOpt.isEmpty()) {
+            ra.addFlashAttribute("error", "Hostel not found.");
+            return "redirect:/api/v1/hostels";
+        }
+        if (result.hasErrors()) {
+            // Re-populate detail view with current data
+            populateHostelDetail(id, 0, model);
+            return "hostels/detail";
+        }
+        // If guest logged in, prefer display name; else use provided author from form
+        if (guestSession != null && guestSession.isLoggedIn()) {
+            String author = (guestSession.getName() != null && !guestSession.getName().isBlank())
+                    ? guestSession.getName() : guestSession.getEmail();
+            form.setAuthor(author);
+        }
+        reviewService.createForHostel(form, hostelOpt.get());
+        ra.addFlashAttribute("success", "Review submitted successfully.");
+        return "redirect:/api/v1/hostels/" + id;
+    }
+
     // Helper to populate detail view model for a hostel, avoiding code repetition
     private void populateHostelDetail(Long id, int page, Model model) {
         var hostel = service.findById(id).orElse(null);
@@ -132,11 +143,7 @@ public class HostelController {
         model.addAttribute("allocations", allocations);
         int allocationCount = allocations != null ? allocations.size() : 0;
         boolean hasAllocations = allocationCount > 0;
-        long roomCount = 0;
-        try {
-            roomCount = roomService.countByHostel(id);
-        } catch (Exception ignored) {
-        }
+        long roomCount = roomService.countByHostel(id);
         boolean hasRooms = roomCount > 0;
         model.addAttribute("hasRooms", hasRooms);
         model.addAttribute("hasAllocations", hasAllocations);
@@ -144,12 +151,8 @@ public class HostelController {
         model.addAttribute("allocationCount", allocationCount);
         long reviewCount = reviewService.countByHostelId(id);
         model.addAttribute("reviewCount", reviewCount);
-        int pageSize = 5;
-        var reviewPage = reviewService.pageByHostel(id, page, pageSize);
+        var reviewPage = reviewService.pageByHostel(id, page, 5);
         model.addAttribute("reviewPage", reviewPage);
         model.addAttribute("reviews", reviewPage.getContent());
-        if (!model.containsAttribute("reviewForm")) {
-            model.addAttribute("reviewForm", new ReviewForm());
-        }
     }
 }

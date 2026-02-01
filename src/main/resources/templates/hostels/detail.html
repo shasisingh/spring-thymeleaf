@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}" lang="en">
 <head>
     <title th:text="${hostel != null ? hostel.name : 'Hostel Detail'}">Hostel Detail</title>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
@@ -44,7 +44,8 @@
                 </div>
                 <div class="hostel-tile">
                     <span class="tile-label">Created At</span>
-                    <span class="tile-value" th:text="${#temporals.format(hostel.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                    <span class="tile-value"
+                          th:text="${#temporals.format(hostel.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </div>
                 <div class="hostel-tile">
                     <span class="tile-label">Reviews</span>
@@ -70,7 +71,8 @@
         <h3>Booked Rooms</h3>
         <div class="actions" style="margin-bottom:.5rem">
             <a class="btn" th:href="@{/api/v1/allocations/create}">Allocate a Room</a>
-            <a class="btn" th:href="@{'/api/v1/rooms/create'(hostelId=${hostel != null ? hostel.id : null})}">Add Room</a>
+            <a class="btn" th:href="@{'/api/v1/rooms/create'(hostelId=${hostel != null ? hostel.id : null})}">Add
+                Room</a>
             <a class="btn secondary" th:href="@{'/api/v1/hostels/' + ${hostel.id} + '/rooms-page'}">Manage Rooms</a>
         </div>
         <div class="table-wrap" th:if="${allocations != null && !#lists.isEmpty(allocations)}">
@@ -132,7 +134,5 @@
     <div class="card" th:if="${hostel != null}">
         <h3>Guest Reviews</h3>
         <div th:replace="~{fragments/reviews :: reviewList(${reviews}, ${reviewPage})}"></div>
-        <div th:replace="~{fragments/reviews :: reviewForm(@{/api/v1/hostels/{id}/reviews(id=${hostel.id})})}"></div>
     </div>
 </section>
-</html>

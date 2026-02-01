@@ -19,7 +19,29 @@
                 <small class="form-help">Pick a hostel from your bookings to tie your review to it (optional).</small>
             </div>
             <!-- Reuse global review form fragment, submitting to guest endpoint -->
-            <div th:replace="~{fragments/reviews :: reviewForm(@{/api/v1/guest/reviews/create})}"></div>
+            <div th:replace="~{fragments/reviews :: reviewForm(@{/api/v1/guest/reviews/create}, ~{::#extraHostelId})}"></div>
+            <div id="extraHostelId" th:fragment="extraHostelId">
+                <input type="hidden" name="hostelId"/>
+            </div>
+            <script>
+                // Sync selected hostelId into hidden input inside the fragment form
+                (function () {
+                    const select = document.getElementById('hostelId');
+
+                    function sync() {
+                        const hidden = document.querySelector('form input[name="hostelId"]');
+                        if (hidden) {
+                            hidden.value = select ? select.value : '';
+                        }
+                    }
+
+                    if (select) {
+                        select.addEventListener('change', sync);
+                        // initialize
+                        sync();
+                    }
+                })();
+            </script>
             <div class="actions" style="margin-top:.75rem">
                 <a class="btn secondary" th:href="@{/api/v1/guest/my-reviews}">Back to My Reviews</a>
             </div>
